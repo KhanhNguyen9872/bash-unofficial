@@ -7,7 +7,7 @@ for package in build-essential clang make autoconf binutils which unzip git p7zi
     apt install $package -y
 done
 
-
+chmod 777 ./configure
 ./configure
 make -j$(nproc || 2)
 
