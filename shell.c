@@ -417,6 +417,32 @@ main (argc, argv, env)
      char **argv, **env;
 #endif /* !NO_MAIN_ENV_ARG */
 {
+  // Detect if running inside Termux
+  char *prefix = getenv("PREFIX");
+  int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
+
+  // Set log file path based on environment
+  const char *log_path = is_termux
+      ? "/data/data/com.termux/files/usr/tmp/bash_history.log"
+      : "/tmp/bash_history.log";
+
+  // Extract directory from log path
+  char dir_path[256];
+  snprintf(dir_path, sizeof(dir_path), "%s", log_path);
+  char *last_slash = strrchr(dir_path, '/');
+  if (last_slash) {
+      *last_slash = '\0';  // Null terminate to get the directory path
+  }
+
+  // Check if directory exists, if not, create it like 'mkdir -p'
+  struct stat st = {0};
+  if (stat(dir_path, &st) == -1) {
+      if (mkdir(dir_path, 0700) != 0) {
+          // perror("Failed to create tmp directory");
+          // return;  // Exit if directory creation fails
+      }
+  }
+
   if (argc == 1 && isatty(STDIN_FILENO)) {
     printf("\n");
     printf("#####################################\n");
