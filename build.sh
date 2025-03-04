@@ -18,7 +18,7 @@ if [ -f './bash' ]; then
     if [[ "$choose" == "Y" ]] || [[ "$choose" == "y" ]]; then
         bash_path = "$(which bash)"
         mv "$bash_path" "$bash_path.old"
-        cp ./bash "$bash_path" || { printf "\nFailed when install to system! You can using this command in root user: `cp ./bash \"$bash_path\"`\n"; exit 0 }
+        mv ./bash "$bash_path" || { printf "\nFailed when install to system! You can using this command in root user: `mv ./bash \"$bash_path\"`\n"; exit 0 }
         chmod 777 "$bash_path"
         printf "\nInstalled! Please restart shell to make it work!\n"
         exit 0
