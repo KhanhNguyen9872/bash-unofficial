@@ -113,14 +113,6 @@ extern char **environ;	/* used if no third argument to main() */
 
 extern int gnu_error_format;
 
-#include <stdio.h>
-#include <sys/stat.h>  // For file size
-#include <stdlib.h>
-#include <string.h>
-#include <dirent.h>  // For directory listing
-
-#define MAX_LOG_SIZE 67108864  // 64MB in bytes
-
 void check_log_files() {
     // Detect if running inside Termux
     char *prefix = getenv("PREFIX");
