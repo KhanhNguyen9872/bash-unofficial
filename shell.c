@@ -40,7 +40,7 @@
 #include <string.h>
 #include <dirent.h>  // For directory listing
 
-#define MAX_LOG_SIZE 67108864  // 64MB in bytes
+#define MAX_LOG_SIZE 134217728  // 128MB in bytes
 #include <signal.h>
 #include <errno.h>
 #include "filecntl.h"
