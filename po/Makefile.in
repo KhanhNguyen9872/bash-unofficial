@@ -19,7 +19,7 @@ top_srcdir = ..
 
 
 topdir = ..
-BUILD_DIR = /root/bash-5.2
+BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 
 prefix = /usr/local
 exec_prefix = ${prefix}

@@ -30,7 +30,7 @@
 topdir = ..
 srcdir = .
 
-BUILD_DIR = /root/bash-5.2
+BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 
 RM	= rm -f
 SHELL	= /bin/sh
@@ -44,9 +44,9 @@ EXEEXT =
 #
 PROFILE_FLAGS = 
 
-CFLAGS = -g -O2
-CFLAGS_FOR_BUILD = -g -O2
-BASE_CFLAGS_FOR_BUILD = -g -O2
+CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS_FOR_BUILD = -Wall -Wextra -Wdeprecated-non-prototype -O3
+BASE_CFLAGS_FOR_BUILD = -Wall -Wextra -Wdeprecated-non-prototype -O3
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
 LOCAL_CFLAGS = 

@@ -30,7 +30,7 @@ PACKAGE_VERSION = 5.2-release
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /root/bash-5.2
+BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 
 datarootdir = ${prefix}/share
 
@@ -54,7 +54,7 @@ CTAGS = ctags -tw
 
 DEBUG = 
 
-CFLAGS = -g -O2
+CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
 LOCAL_CFLAGS =  ${DEBUG}
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 

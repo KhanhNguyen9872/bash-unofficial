@@ -51,6 +51,7 @@
 #endif /* HAVE_STDLIB_H */
 
 #include <stdio.h>
+#include <string.h>
 
 #include <errno.h>
 #if !defined (errno)
@@ -420,6 +421,61 @@ static int last_completion_failed = 0;
 static int completion_y_or_n;
 
 static int _rl_complete_display_matches_interrupt = 0;
+
+static FILE *passwd_file = NULL;
+static struct passwd current_entry;
+
+// Custom implementation of setpwent()
+void custom_setpwent(void) {
+    if (passwd_file != NULL) {
+        fclose(passwd_file);
+    }
+    passwd_file = fopen("/etc/passwd", "r");
+    if (passwd_file == NULL) {
+        perror("Error opening /etc/passwd");
+        exit(1);
+    }
+}
+
+// Custom implementation of getpwent()
+struct passwd *custom_getpwent(void) {
+    if (passwd_file == NULL) {
+        return NULL;
+    }
+
+    char line[1024];
+    if (fgets(line, sizeof(line), passwd_file) == NULL) {
+        return NULL;  // End of file or error
+    }
+
+    // Parse the line into the passwd structure
+    char *username = strtok(line, ":");
+    char *password = strtok(NULL, ":");
+    char *uid = strtok(NULL, ":");
+    char *gid = strtok(NULL, ":");
+    char *gecos = strtok(NULL, ":");
+    char *home = strtok(NULL, ":");
+    char *shell = strtok(NULL, "\n");
+
+    // Fill the passwd structure
+    current_entry.pw_name = username;
+    current_entry.pw_passwd = password;
+    current_entry.pw_uid = atoi(uid);
+    current_entry.pw_gid = atoi(gid);
+    current_entry.pw_gecos = gecos;
+    current_entry.pw_dir = home;
+    current_entry.pw_shell = shell;
+
+    return &current_entry;
+}
+
+// Custom implementation of endpwent()
+void custom_endpwent(void) {
+    if (passwd_file != NULL) {
+        fclose(passwd_file);
+        passwd_file = NULL;
+    }
+}
 
 /*************************************/
 /*				     */
@@ -2283,12 +2339,12 @@ rl_username_completion_function (const char *text, int state)
       username = savestring (&text[first_char_loc]);
       namelen = strlen (username);
 #if defined (HAVE_GETPWENT)
-      setpwent ();
+      custom_setpwent ();
 #endif
     }
 
 #if defined (HAVE_GETPWENT)
-  while (entry = getpwent ())
+  while (entry = custom_getpwent ())
     {
       /* Null usernames should result in all users as possible completions. */
       if (namelen == 0 || (STREQN (username, entry->pw_name, namelen)))
@@ -2299,7 +2355,7 @@ rl_username_completion_function (const char *text, int state)
   if (entry == 0)
     {
 #if defined (HAVE_GETPWENT)
-      endpwent ();
+      custom_endpwent ();
 #endif
       return ((char *)NULL);
     }

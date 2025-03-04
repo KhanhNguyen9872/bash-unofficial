@@ -22,7 +22,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ../..
-top_builddir = /root/bash-5.2
+top_builddir = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 
 
 prefix = /usr/local
@@ -67,7 +67,7 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" -DLOCALE_ALIAS_PATH=\"$(aliaspath)\" \
 -Drelocate=libintl_relocate \
 -DDEPENDS_ON_LIBICONV=1 -DHAVE_CONFIG_H ${LOCAL_DEFS}
 CPPFLAGS = 
-CFLAGS = -g -O2
+CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
 LDFLAGS = 
 LIBS = -ldl 
 

@@ -18,7 +18,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /root/bash-5.2
+BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -36,7 +36,7 @@ SHELL = /bin/sh
 
 PROFILE_FLAGS = 
 
-CFLAGS = -g -O2
+CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
 LOCAL_CFLAGS = 
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 

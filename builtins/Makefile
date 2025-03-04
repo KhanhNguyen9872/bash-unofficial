@@ -52,7 +52,7 @@ DESTDIR =
 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
-BUILD_DIR = /root/bash-5.2
+BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 
 LIBBUILD = ${BUILD_DIR}/lib
 

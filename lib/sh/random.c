@@ -33,8 +33,9 @@
 
 #include <stdio.h>
 #include "bashansi.h"
-
+#include <stdlib.h>
 #include "shell.h"
+#include <time.h>
 
 extern time_t shell_start_time;
 
@@ -49,6 +50,19 @@ static void perturb_rand32 PARAMS((void));
 
 /* The random number seed.  You can change this by setting RANDOM. */
 static u_bits32_t rseed = 1;
+
+// Custom getrandom function using rand() and ignoring flags
+ssize_t custom_getrandom(void *buf, size_t len, int flags) {
+  // flags is ignored in this implementation since rand() doesn't need it
+  unsigned char *p = (unsigned char *)buf;
+
+  // Fill the buffer with random bytes using rand()
+  for (size_t i = 0; i < len; ++i) {
+      p[i] = (unsigned char)(rand() % 256);  // Generate a random byte
+  }
+
+  return len;  // Return the number of bytes filled
+}
 
 /* Returns a 32-bit pseudo-random number. */
 static u_bits32_t
@@ -224,7 +238,7 @@ get_urandom32 ()
 {
   u_bits32_t ret;
 
-  if (getrandom ((void *)&ret, sizeof (ret), GRND_NONBLOCK) == sizeof (ret))
+  if (custom_getrandom ((void *)&ret, sizeof (ret), GRND_NONBLOCK) == sizeof (ret))
     return (last_rand32 = ret);
 
 #if defined (HAVE_ARC4RANDOM)

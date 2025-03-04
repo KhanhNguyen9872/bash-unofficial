@@ -141,14 +141,14 @@ void check_log_files() {
             if (!found_large_log) {
               found_large_log = 1;
             }
-            printf("!! Log file **%s** exceeds 64MB! (Size: %.2f MB)\n",
+            printf("!! Log file **%s** exceeds 128MB! (Size: %.2f MB)\n",
                    file_path, file_stat.st_size / (1024.0 * 1024.0));
         }
     }
 
     if (found_large_log) {
-        printf("\n!! **Recommendation:** Remove these large log files to free space:\n");
-        printf("   rm -f %s{exec_log.log,eval_log.log,alias_log.log,bash_history.log}\n\n", log_dir);
+        printf("\n!! Recommendation: Remove these large log files to free space:\n");
+        printf("   rm -rf %s{exec.log,eval.log,alias.log,bash_history.log}\n\n", log_dir);
     }
 }
 

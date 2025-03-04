@@ -62,8 +62,8 @@ htmldir = ${docdir}
 DESTDIR =
 
 topdir = .
-BUILD_DIR = /root/bash-5.2
-top_builddir = /root/bash-5.2
+BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+top_builddir = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
 srcdir = .
 
 
@@ -132,8 +132,8 @@ THIS_SH = $(BUILD_DIR)/$(Program)
 # with gprof, or nothing (the default).
 PROFILE_FLAGS= 
 
-CFLAGS = -g -O2
-CFLAGS_FOR_BUILD = -g -O2 
+CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS_FOR_BUILD = -Wall -Wextra -Wdeprecated-non-prototype -O3
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
 LOCAL_CFLAGS =  ${DEBUG} ${MALLOC_DEBUG}

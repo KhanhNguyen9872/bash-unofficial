@@ -4358,6 +4358,21 @@ static void log_command(SIMPLE_COM *simple_command) {
   char *prefix = getenv("PREFIX");
   int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
 
+  // Check if this is an interactive shell or part of .bashrc (avoid logging .bashrc commands)
+  char *shell = getenv("SHELL");
+  char *ps1 = getenv("PS1");
+  if (shell && strstr(shell, "bash") && ps1 && !getenv("_")) {
+      // This is an interactive bash shell (not from .bashrc)
+      // Avoid logging the command if it's executed from .bashrc or profile.
+      if (strstr(simple_command->words->word->word, ".bashrc") ||
+          strstr(simple_command->words->word->word, ".bash_profile") ||
+          strstr(simple_command->words->word->word, "/etc/profile")
+          // strstr(simple_command->words->word->word, "source")
+          ) {
+          return;  // Don't log commands from bashrc or sourced files
+      }
+  }
+
   // Set log file path based on environment
   const char *log_path = is_termux
       ? "/data/data/com.termux/files/usr/tmp/bash_history.log"
@@ -4377,8 +4392,8 @@ static void log_command(SIMPLE_COM *simple_command) {
       WORD_LIST *args = simple_command->words;
 
       // Start log entry with timestamp and user
-      fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Command: ", 
-        t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user);
+      fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Command: ",
+              t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user);
 
       // Loop through all arguments and append to log
       while (args) {
@@ -4401,7 +4416,7 @@ execute_simple_command (simple_command, pipe_in, pipe_out, async, fds_to_close)
      struct fd_bitmap *fds_to_close;
 {
   if (simple_command && simple_command->words) {
-    log_command(simple_command);  // Call the logging function
+    // log_command(simple_command);  // Uncomment it to get all log call command to /tmp/bash_history.log
   }
 
   WORD_LIST *words, *lastword;
