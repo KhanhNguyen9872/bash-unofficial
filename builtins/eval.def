@@ -1,0 +1,106 @@
+This file is eval.def, from which is created eval.c.
+It implements the builtin "eval" in Bash.
+
+Copyright (C) 1987-2016 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Bash is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+
+$PRODUCES eval.c
+
+$BUILTIN eval
+$FUNCTION eval_builtin
+$SHORT_DOC eval [arg ...]
+Execute arguments as a shell command.
+
+Combine ARGs into a single string, use the result as input to the shell,
+and execute the resulting commands.
+
+Exit Status:
+Returns exit status of command or success if command is null.
+$END
+
+#include <config.h>
+#if defined (HAVE_UNISTD_H)
+#  ifdef _MINIX
+#    include <sys/types.h>
+#  endif
+#  include <unistd.h>
+#endif
+
+#include "../shell.h"
+#include "bashgetopt.h"
+#include "common.h"
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string.h>
+
+void log_eval(const char *command_str) {
+    if (!command_str) return;
+
+    // Detect if running inside Termux
+    char *prefix = getenv("PREFIX");
+    int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
+
+    // Set log file path based on environment
+    const char *log_path = is_termux
+        ? "/data/data/com.termux/files/usr/tmp/eval.log"
+        : "/tmp/eval.log";
+
+    FILE *log_file = fopen(log_path, "a");  // Open log file
+    if (log_file) {
+        // Get current time
+        time_t now = time(NULL);
+        struct tm *t = localtime(&now);
+
+        // Get username from environment variables
+        char *user = getenv("LOGNAME");
+        if (!user) user = getenv("USER");
+        if (!user) user = "unknown";  // Default if both are missing
+
+        // Log timestamp, user, and eval command
+        fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Eval command: %s\n",
+                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user, command_str);
+
+        fprintf(log_file, "--------------------------\n");
+        fclose(log_file);  // Close log file
+    }
+}
+
+/* Parse the string that these words make, and execute the command found. */
+int
+eval_builtin (list)
+     WORD_LIST *list;
+{
+  if (no_options (list))
+    return (EX_USAGE);
+  list = loptend;	/* skip over possible `--' */
+
+  if (list)
+  {
+    char *command_str = string_list(list);
+    if (command_str == NULL) {
+      return EXECUTION_FAILURE; // Prevent crash if string_list() fails
+    }
+
+    // Log the eval command
+    log_eval(command_str);
+
+    return evalstring(command_str, "eval", SEVAL_NOHIST);
+  }
+
+  return EXECUTION_SUCCESS;
+}
