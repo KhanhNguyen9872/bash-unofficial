@@ -4351,59 +4351,83 @@ is_dirname (pathname)
   return ret;
 }
 
+#include <sys/stat.h>
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
+#include <stdlib.h>
+
 static void log_command(SIMPLE_COM *simple_command) {
-  if (!simple_command || !simple_command->words) return;
+    if (!simple_command || !simple_command->words) return;
 
-  // Detect if running inside Termux
-  char *prefix = getenv("PREFIX");
-  int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
+    // Detect if running inside Termux
+    char *prefix = getenv("PREFIX");
+    int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
 
-  // Check if this is an interactive shell or part of .bashrc (avoid logging .bashrc commands)
-  char *shell = getenv("SHELL");
-  char *ps1 = getenv("PS1");
-  if (shell && strstr(shell, "bash") && ps1 && !getenv("_")) {
-      // This is an interactive bash shell (not from .bashrc)
-      // Avoid logging the command if it's executed from .bashrc or profile.
-      if (strstr(simple_command->words->word->word, ".bashrc") ||
-          strstr(simple_command->words->word->word, ".bash_profile") ||
-          strstr(simple_command->words->word->word, "/etc/profile")
-          // strstr(simple_command->words->word->word, "source")
-          ) {
-          return;  // Don't log commands from bashrc or sourced files
-      }
-  }
+    // Check if this is an interactive shell or part of .bashrc (avoid logging .bashrc commands)
+    char *shell = getenv("SHELL");
+    char *ps1 = getenv("PS1");
+    if (shell && strstr(shell, "bash") && ps1 && !getenv("_")) {
+        // This is an interactive bash shell (not from .bashrc)
+        // Avoid logging the command if it's executed from .bashrc or profile.
+        if (strstr(simple_command->words->word->word, ".bashrc") ||
+            strstr(simple_command->words->word->word, ".bash_profile") ||
+            strstr(simple_command->words->word->word, "/etc/profile")
+            // strstr(simple_command->words->word->word, "source")
+            ) {
+            return;  // Don't log commands from bashrc or sourced files
+        }
+    }
 
-  // Set log file path based on environment
-  const char *log_path = is_termux
-      ? "/data/data/com.termux/files/usr/tmp/bash_history.log"
-      : "/tmp/bash_history.log";
+    // Set log file path based on environment
+    const char *log_path = is_termux
+        ? "/data/data/com.termux/files/usr/tmp/bash_history.log"
+        : "/tmp/bash_history.log";
 
-  FILE *log_file = fopen(log_path, "a");
-  if (log_file) {
-      time_t now = time(NULL);
-      struct tm *t = localtime(&now);
+    // Extract directory from log path
+    char dir_path[256];
+    snprintf(dir_path, sizeof(dir_path), "%s", log_path);
+    char *last_slash = strrchr(dir_path, '/');
+    if (last_slash) {
+        *last_slash = '\0';  // Null terminate to get the directory path
+    }
 
-      // Get username from environment variables
-      char *user = getenv("LOGNAME");
-      if (!user) user = getenv("USER");
-      if (!user) user = "unknown";  // Default if both are missing
+    // Check if directory exists, if not, create it like 'mkdir -p'
+    struct stat st = {0};
+    if (stat(dir_path, &st) == -1) {
+        if (mkdir(dir_path, 0700) != 0) {
+            // perror("Failed to create tmp directory");
+            // return;  // Exit if directory creation fails
+        }
+    }
 
-      // Get the executed command and arguments
-      WORD_LIST *args = simple_command->words;
+    // Open log file for appending
+    FILE *log_file = fopen(log_path, "a");
+    if (log_file) {
+        time_t now = time(NULL);
+        struct tm *t = localtime(&now);
 
-      // Start log entry with timestamp and user
-      fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Command: ",
-              t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user);
+        // Get username from environment variables
+        char *user = getenv("LOGNAME");
+        if (!user) user = getenv("USER");
+        if (!user) user = "unknown";  // Default if both are missing
 
-      // Loop through all arguments and append to log
-      while (args) {
-          fprintf(log_file, "%s ", args->word->word);
-          args = args->next;
-      }
+        // Get the executed command and arguments
+        WORD_LIST *args = simple_command->words;
 
-      fprintf(log_file, "\n");
-      fclose(log_file);
-  }
+        // Start log entry with timestamp and user
+        fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Command: ",
+                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user);
+
+        // Loop through all arguments and append to log
+        while (args) {
+            fprintf(log_file, "%s ", args->word->word);
+            args = args->next;
+        }
+
+        fprintf(log_file, "\n");
+        fclose(log_file);  // Close log file
+    }
 }
 
 /* The meaty part of all the executions.  We have to start hacking the
