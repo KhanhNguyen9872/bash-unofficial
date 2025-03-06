@@ -630,6 +630,19 @@ same_file (path1, path2, stp1, stp2)
   return ((stp1->st_dev == stp2->st_dev) && (stp1->st_ino == stp2->st_ino));
 }
 
+int custom_getdtablesize() {
+  long max_fd = sysconf(_SC_OPEN_MAX);
+  if (max_fd == -1) {
+      /* Fallback: Use getrlimit if sysconf fails */
+      struct rlimit limit;
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
+          return (int)limit.rlim_cur;
+      }
+      return 32768; // Indicate failure
+  }
+  return (int)max_fd;
+}
+
 /* Move FD to a number close to the maximum number of file descriptors
    allowed in the shell process, to avoid the user stepping on it with
    redirection and causing us extra work.  If CHECK_NEW is non-zero,
@@ -645,7 +658,7 @@ move_to_high_fd (fd, check_new, maxfd)
 
   if (maxfd < 20)
     {
-      nfds = getdtablesize ();
+      nfds = custom_getdtablesize ();
       if (nfds <= 0)
 	nfds = 20;
       if (nfds > HIGH_FD_MAX)

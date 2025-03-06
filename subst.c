@@ -68,6 +68,13 @@
 #include <tilde/tilde.h>
 #include <glob/strmatch.h>
 
+#if defined (HAVE_SYS_RESOURCE_H) && defined (RLIMTYPE)
+#  if defined (HAVE_SYS_TIME_H)
+#    include <sys/time.h>
+#  endif
+#  include <sys/resource.h>
+#endif
+
 #if !defined (errno)
 extern int errno;
 #endif /* !errno */
@@ -6262,6 +6269,19 @@ copy_fifo_list (sizep)
   return (memcpy (ret, dev_fd_list, totfds * sizeof (pid_t)));
 }
 
+int custom_getdtablesize() {
+  long max_fd = sysconf(_SC_OPEN_MAX);
+  if (max_fd == -1) {
+      /* Fallback: Use getrlimit if sysconf fails */
+      struct rlimit limit;
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
+          return (int)limit.rlim_cur;
+      }
+      return 32768; // Indicate failure
+  }
+  return (int)max_fd;
+}
+
 static void
 add_fifo_list (fd)
      int fd;
@@ -6271,7 +6291,7 @@ add_fifo_list (fd)
       int ofds;
 
       ofds = totfds;
-      totfds = getdtablesize ();
+      totfds = custom_getdtablesize ();
       if (totfds < 0 || totfds > 256)
 	totfds = 256;
       if (fd >= totfds)
