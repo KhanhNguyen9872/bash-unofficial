@@ -631,7 +631,16 @@ same_file (path1, path2, stp1, stp2)
 }
 
 int custom_getdtablesize() {
-  return 262144;
+  long max_fd = sysconf(_SC_OPEN_MAX);
+  if (max_fd == -1) {
+      /* Fallback: Use getrlimit if sysconf fails */
+      struct rlimit limit;
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
+          return (int)limit.rlim_cur;
+      }
+      return 65536; // Indicate failure
+  }
+  return (int)max_fd;
 }
 
 /* Move FD to a number close to the maximum number of file descriptors
