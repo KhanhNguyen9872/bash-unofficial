@@ -2,13 +2,14 @@ printf "\nUpdating apt....\n"
 
 apt update
 
-for package in build-essential clang make autoconf binutils which unzip git p7zip pv ncurses-utils; do
+for package in build-essential clang make autoconf binutils which unzip git p7zip pv ncurses-utils coreutils diffutils findutils gawk grep gzip sed tar texinfo automake bison flex gettext libiconv ncurses; do
     printf "\nInstalling ${package}...\n"
     apt install $package -y
 done
 
 chmod 777 ./configure
-./configure
+make clean
+./configure --prefix=$PREFIX --host=aarch64-linux-android
 make -j$(nproc || 2)
 
 if [ -f './bash' ]; then
