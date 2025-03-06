@@ -84,6 +84,10 @@ $END
 #  include <unistd.h>
 #endif
 
+#if defined (HAVE_SYS_RESOURCE_H)
+#  include <sys/resource.h>
+#endif
+
 #include <stdio.h>
 #include <errno.h>
 
@@ -507,6 +511,19 @@ ulimit_internal (cmd, cmdarg, mode, multiple)
   return (EXECUTION_SUCCESS);
 }
 
+int custom_getdtablesize2() {
+  long max_fd = sysconf(_SC_OPEN_MAX);
+  if (max_fd == -1) {
+      /* Fallback: Use getrlimit if sysconf fails */
+      struct rlimit limit;
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
+          return (int)limit.rlim_cur;
+      }
+      return 32768; // Indicate failure
+  }
+  return (int)max_fd;
+}
+
 static int
 get_limit (ind, softlim, hardlim)
      int ind;
@@ -530,7 +547,7 @@ get_limit (ind, softlim, hardlim)
 	    return -1;
 	  break;
 	case RLIMIT_OPENFILES:
-	  value = (RLIMTYPE)custom_getdtablesize ();
+	  value = (RLIMTYPE)custom_getdtablesize2 ();
 	  break;
 	case RLIMIT_VIRTMEM:
 	  return (getmaxvm (softlim, hardlim));
