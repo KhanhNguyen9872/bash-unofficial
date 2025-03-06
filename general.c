@@ -630,7 +630,7 @@ same_file (path1, path2, stp1, stp2)
   return ((stp1->st_dev == stp2->st_dev) && (stp1->st_ino == stp2->st_ino));
 }
 
-int custom_getdtablesize1() {
+int custom_getdtablesize() {
   return 262144;
 }
 

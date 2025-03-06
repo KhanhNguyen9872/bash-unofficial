@@ -511,7 +511,7 @@ ulimit_internal (cmd, cmdarg, mode, multiple)
   return (EXECUTION_SUCCESS);
 }
 
-int custom_getdtablesize1() {
+int custom_getdtablesize2() {
   return 262144;
 }
 
