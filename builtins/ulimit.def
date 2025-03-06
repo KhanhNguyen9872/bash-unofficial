@@ -84,10 +84,6 @@ $END
 #  include <unistd.h>
 #endif
 
-#if defined (HAVE_SYS_RESOURCE_H)
-#  include <sys/resource.h>
-#endif
-
 #include <stdio.h>
 #include <errno.h>
 
@@ -510,18 +506,6 @@ ulimit_internal (cmd, cmdarg, mode, multiple)
 
   return (EXECUTION_SUCCESS);
 }
-
-int custom_getdtablesize() {
-   long max_fd = sysconf(_SC_OPEN_MAX);
-   if (max_fd == -1) {
-       struct rlimit limit;
-       if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
-           return (int)limit.rlim_cur;
-       }
-       return 32768; 
-   }
-   return (int)max_fd;
- }
 
 static int
 get_limit (ind, softlim, hardlim)
