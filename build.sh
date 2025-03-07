@@ -1,11 +1,24 @@
+if [[ "$PREFIX" != "/data/data/com.termux/files/usr" ]]; then
+    if [ "$(id -u)" -ne 0 ]; then
+        echo "This script must be run as root user!"
+        exit 64
+    fi
+fi
+
 printf "\nUpdating apt....\n"
 
 apt update
 
-for package in build-essential clang make autoconf binutils which unzip git p7zip pv ncurses-utils coreutils diffutils findutils gawk grep gzip sed tar texinfo automake bison flex gettext libiconv ncurses; do
+for package in sudo tsu build-essential clang make autoconf binutils which unzip git p7zip pv ncurses-utils coreutils diffutils findutils gawk grep gzip sed tar texinfo automake bison flex gettext libiconv ncurses; do
     printf "\nInstalling ${package}...\n"
     apt install $package -y
 done
+
+if [[ "$PREFIX" != "/data/data/com.termux/files/usr" ]]; then
+    apt --purge remove gcc g++ -y;
+    ln -sf "$(which clang)" /usr/bin/gcc
+    ln -sf "$(which clang)" /usr/bin/g++
+fi
 
 chmod 777 ./configure
 make clean
