@@ -25,7 +25,7 @@ make clean
 ./configure --prefix=$PREFIX
 make -j$(nproc || 2)
 
-if [ -f './bash' ]; then
+if [ -f ./bash ]; then
     printf "\nBuild process completed!\n"
     printf "\nDo you want to install to system? [Y/n]: "
     read choose
@@ -34,6 +34,7 @@ if [ -f './bash' ]; then
         mv "$bash_path" "$bash_path.old"
         mv ./bash "$bash_path" || { printf "\nFailed when installing to system! You can use this command as root user: `mv ./bash \"$bash_path\"`\n"; exit 0; }
         chmod 777 "$bash_path"
+        make install
         printf "\nInstalled! Please restart the shell to make it work!\n"
         exit 0
     fi

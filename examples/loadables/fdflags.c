@@ -25,6 +25,10 @@
 #if defined (HAVE_UNISTD_H)
 #  include <unistd.h>
 #endif
+
+#if defined (HAVE_SYS_RESOURCE_H)
+#  include <sys/resource.h>
+#endif
 #include <fcntl.h>
 #include <errno.h>
 #include "bashansi.h"
@@ -256,6 +260,19 @@ setone(int fd, char *v, int verbose)
     builtin_error("can't set flags for fd %d: %s", fd, strerror(errno));
 }
 
+int custom_getdtablesize3() {
+  long max_fd = sysconf(_SC_OPEN_MAX);
+  if (max_fd == -1) {
+      /* Fallback: Use getrlimit if sysconf fails */
+      struct rlimit limit;
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
+          return (int)limit.rlim_cur;
+      }
+      return 65536; // Indicate failure
+  }
+  return (int)max_fd;
+}
+
 static int
 getmaxfd ()
 {
@@ -267,7 +284,7 @@ getmaxfd ()
     return maxfd;
 #endif
 
-  maxfd = custom_getdtablesize ();
+  maxfd = custom_getdtablesize3 ();
   if (maxfd <= 0)
     maxfd = HIGH_FD_MAX;
   for (maxfd--; maxfd > 0; maxfd--)
