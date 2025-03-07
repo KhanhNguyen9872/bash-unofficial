@@ -95,7 +95,7 @@ dup2 (fd1, fd2)
   if (fcntl (fd1, F_GETFL, 0) == -1)
     return (-1);
 
-  if (fd2 < 0 || fd2 >= getdtablesize ())
+  if (fd2 < 0 || fd2 >= custom_getdtablesize ())
     {
       errno = EBADF;
       return (-1);

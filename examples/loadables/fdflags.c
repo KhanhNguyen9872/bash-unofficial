@@ -267,7 +267,7 @@ getmaxfd ()
     return maxfd;
 #endif
 
-  maxfd = getdtablesize ();
+  maxfd = custom_getdtablesize ();
   if (maxfd <= 0)
     maxfd = HIGH_FD_MAX;
   for (maxfd--; maxfd > 0; maxfd--)
