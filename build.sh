@@ -22,7 +22,7 @@ fi
 
 chmod 777 ./configure
 make clean
-./configure --prefix=$PREFIX --host=aarch64-linux-android
+./configure --prefix=$PREFIX
 make -j$(nproc || 2)
 
 if [ -f './bash' ]; then
