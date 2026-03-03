@@ -581,8 +581,8 @@ initialize_shell_variables (env, privmode)
 //     }
     if (interactive_shell)
     {
-      set_if_not ("PS1", "\n|-[\\u@KhanhNguyen9872]-[\\w]\n|-> ");  // Custom PS1
-      set_if_not ("PS2", "|-> "); // Continuation prompt for multi-line commands
+      set_if_not ("PS1", "\n|-[\\u@\\h]-[\\w]\n|-> ");
+      set_if_not ("PS2", "|-> ");
     }
 
   if (current_user.euid == 0)

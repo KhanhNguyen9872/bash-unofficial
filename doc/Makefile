@@ -33,7 +33,7 @@ topdir = ..
 srcdir = .
 
 
-prefix = /usr/local
+prefix = 
 exec_prefix = ${prefix}
 
 datarootdir = ${prefix}/share
@@ -58,7 +58,7 @@ man3dir = $(mandir)/$(manpfx)3
 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
 
 SUPPORT_SRCDIR = $(topdir)/support
 

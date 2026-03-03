@@ -29,7 +29,7 @@ PACKAGE_VERSION = 5.2-release
 PACKAGE_TARNAME = bash
 
 # Include some boilerplate Gnu makefile definitions.
-prefix = /usr/local
+prefix = 
 
 exec_prefix = ${prefix}
 
@@ -62,8 +62,8 @@ htmldir = ${docdir}
 DESTDIR =
 
 topdir = .
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
-top_builddir = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
+top_builddir = /home/user/Desktop/bash-unofficial
 srcdir = .
 
 
@@ -132,8 +132,8 @@ THIS_SH = $(BUILD_DIR)/$(Program)
 # with gprof, or nothing (the default).
 PROFILE_FLAGS= 
 
-CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
-CFLAGS_FOR_BUILD = -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS_FOR_BUILD = -g -Wall -Wextra -Wdeprecated-non-prototype -O3 
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
 LOCAL_CFLAGS =  ${DEBUG} ${MALLOC_DEBUG}
@@ -1779,3 +1779,8 @@ builtins/type.o: $(DEFSRC)/type.def
 builtins/ulimit.o: $(DEFSRC)/ulimit.def
 builtins/umask.o: $(DEFSRC)/umask.def
 builtins/wait.o: $(DEFSRC)/wait.def
+CFLAGS += -DSPOOFED_VERSION='"5.2.0(1)-release"'
+CFLAGS += -DSPOOFED_MACHTYPE='"x86_64-pc-linux-gnu"'
+CFLAGS += -DSPOOFED_COPYRIGHT='"Copyright (C) 2022 Free Software Foundation, Inc."'
+CFLAGS += -DSPOOFED_LICENSE='"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"'
+CFLAGS += -DSPOOFED_WARRANTY='"This is free software; you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."'

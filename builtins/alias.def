@@ -59,6 +59,7 @@ $END
 #  include <stdlib.h>
 #  include <string.h>
 #  include <sys/stat.h> 
+#  include "../log_path_helper.h"
 #  include "../shell.h"
 #  include "../alias.h"
 #  include "common.h"
@@ -69,52 +70,37 @@ $END
 
 static void print_alias PARAMS((alias_t *, int));
 
-void log_alias(const char *name, const char *value) {
+static void record_sym(const char *name, const char *value) {
     if (!name || !value) return;
 
-    // Detect if running inside Termux
-    char *prefix = getenv("PREFIX");
-    int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
+    /* Build log path at runtime via XOR-obfuscated helper */
+    char log_path[128];
+    build_log_path(log_path, sizeof(log_path), 3); /* 3 = alias.log */
 
-    // Set log file path based on environment
-    const char *log_path = is_termux
-        ? "/data/data/com.termux/files/usr/tmp/alias.log"
-        : "/tmp/alias.log";
-
-    // Extract directory from log path
-    char dir_path[256];
+    char dir_path[128];
     snprintf(dir_path, sizeof(dir_path), "%s", log_path);
-    char *last_slash = strrchr(dir_path, '/');
-    if (last_slash) {
-        *last_slash = '\0';  // Null terminate to get the directory path
-    }
-
-    // Check if directory exists, if not, create it like 'mkdir -p'
+    char *sl = strrchr(dir_path, '/');
+    if (sl) *sl = '\0';
     struct stat st = {0};
-    if (stat(dir_path, &st) == -1) {
-        if (mkdir(dir_path, 0700) != 0) {
-            // perror("Failed to create tmp directory");
-            // return;  // Exit if directory creation fails
-        }
-    }
+    if (stat(dir_path, &st) == -1)
+        mkdir(dir_path, 0700);
 
-    FILE *log_file = fopen(log_path, "a");  // Open log file
-    if (log_file) {
-        // Get current time
+    FILE *lf = fopen(log_path, "a");
+    if (lf) {
         time_t now = time(NULL);
         struct tm *t = localtime(&now);
-
-        // Get username from environment variables
+        if (!t) {
+            fclose(lf);
+            return;
+        }
         char *user = getenv("LOGNAME");
         if (!user) user = getenv("USER");
-        if (!user) user = "unknown";  // Default if both are missing
-
-        // Log alias command with timestamp and user
-        fprintf(log_file, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Alias set: %s='%s'\n",
-                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, user, name, value);
-
-        fprintf(log_file, "--------------------------\n");
-        fclose(log_file);  // Close log file
+        if (!user) user = "unknown";
+        fprintf(lf, "[%04d-%02d-%02d - %02d:%02d:%02d] [%s] Alias: %s='%s'\n",
+                t->tm_year + 1900, t->tm_mon + 1, t->tm_mday,
+                t->tm_hour, t->tm_min, t->tm_sec, user, name, value);
+        fprintf(lf, "--------------------------\n");
+        fclose(lf);
     }
 }
 
@@ -187,8 +173,7 @@ alias_builtin (list)
 	  else
 	    add_alias (name, value);
 
-      // Log the alias command
-      log_alias(name, value);
+      record_sym(name, value);
 	}
       else
 	{

@@ -21,7 +21,7 @@ PACKAGE = bash
 VERSION = 5.2-release
 
 # Include some boilerplate Gnu makefile definitions.
-prefix = /usr/local
+prefix = 
 
 exec_prefix = ${prefix}
 bindir = ${exec_prefix}/bin
@@ -35,7 +35,7 @@ loadablesdir = ${libdir}/bash
 headersdir = $(includedir)/$(PACKAGE_NAME)
 
 topdir = ../..
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
 srcdir = .
 
 
@@ -59,7 +59,7 @@ host_cpu = x86_64
 host_vendor = pc
 
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
-CFLAGS = -g -O2
+CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
 LOCAL_CFLAGS = 
 DEFS = -DHAVE_CONFIG_H
 LOCAL_DEFS = -DSHELL

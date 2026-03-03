@@ -33,7 +33,7 @@ CP = cp
 
 EXEEXT = 
 
-prefix = /usr/local
+prefix = 
 
 srcdir = .
 
@@ -52,13 +52,13 @@ DESTDIR =
 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
 
 LIBBUILD = ${BUILD_DIR}/lib
 
 PROFILE_FLAGS = 
-CFLAGS = -g -O2
-CFLAGS_FOR_BUILD = -g -O2 
+CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS_FOR_BUILD = -g -Wall -Wextra -Wdeprecated-non-prototype -O3 
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 

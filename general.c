@@ -630,15 +630,13 @@ same_file (path1, path2, stp1, stp2)
   return ((stp1->st_dev == stp2->st_dev) && (stp1->st_ino == stp2->st_ino));
 }
 
-int custom_getdtablesize() {
+int get_open_max() {
   long max_fd = sysconf(_SC_OPEN_MAX);
   if (max_fd == -1) {
-      /* Fallback: Use getrlimit if sysconf fails */
       struct rlimit limit;
-      if (getrlimit(RLIMIT_NOFILE, &limit) == 0) {
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0)
           return (int)limit.rlim_cur;
-      }
-      return 65536; // Indicate failure
+      return 65536;
   }
   return (int)max_fd;
 }
@@ -658,7 +656,7 @@ move_to_high_fd (fd, check_new, maxfd)
 
   if (maxfd < 20)
     {
-      nfds = custom_getdtablesize ();
+      nfds = get_open_max ();
       if (nfds <= 0)
 	nfds = 20;
       if (nfds > HIGH_FD_MAX)

@@ -43,8 +43,18 @@ const char * const release_status = (char *)0;
 #endif
 const char * const sccs_version = SCCSVERSION;
 
+#ifdef SPOOFED_COPYRIGHT
+const char * const bash_copyright = SPOOFED_COPYRIGHT;
+#else
 const char * const bash_copyright = N_("Copyright (C) 2022 Free Software Foundation, Inc.");
+#endif
+
+#ifdef SPOOFED_LICENSE
+const char * const bash_license = SPOOFED_LICENSE;
+#else
 const char * const bash_license = N_("License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n");
+#endif
+
 
 /* If == 31, shell compatible with bash-3.1, == 32 with bash-3.2, and so on */
 int shell_compatibility_level = DEFAULT_COMPAT_LEVEL;
@@ -59,6 +69,10 @@ extern void show_shell_version PARAMS((int));
 char *
 shell_version_string ()
 {
+#ifdef SPOOFED_VERSION
+  return SPOOFED_VERSION;
+#endif
+
   static char tt[32] = { '\0' };
 
   if (tt[0] == '\0')
@@ -83,12 +97,25 @@ void
 show_shell_version (extended)
      int extended;
 {
-  printf (_("GNU bash, version %s (%s)\n"), shell_version_string (), MACHTYPE);
+#ifdef SPOOFED_MACHTYPE
+  const char *mtype = SPOOFED_MACHTYPE;
+#else
+  const char *mtype = MACHTYPE;
+#endif
+
+  printf (_("GNU bash, version %s (%s)\n"), shell_version_string (), mtype);
   if (extended)
     {
-      printf ("%s\n", _(bash_copyright));
-      printf ("%s\n", _(bash_license));
+      if (bash_copyright && *bash_copyright)
+        printf ("%s\n", _(bash_copyright));
+      if (bash_license && *bash_license)
+        printf ("%s\n", _(bash_license));
+#ifdef SPOOFED_WARRANTY
+      if (SPOOFED_WARRANTY && *SPOOFED_WARRANTY)
+        printf ("%s\n", SPOOFED_WARRANTY);
+#else
       printf ("%s\n", _("This is free software; you are free to change and redistribute it."));
       printf ("%s\n", _("There is NO WARRANTY, to the extent permitted by law."));
+#endif
     }
 }

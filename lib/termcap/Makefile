@@ -22,7 +22,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
 
 libdir = ${exec_prefix}/lib
 
@@ -40,7 +40,7 @@ MV = mv
 
 SHELL = /bin/sh
 
-CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
 CPPFLAGS = 
 LDFLAGS = 
 

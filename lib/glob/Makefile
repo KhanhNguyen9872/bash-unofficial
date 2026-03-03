@@ -22,7 +22,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -40,7 +40,7 @@ SHELL = /bin/sh
 
 PROFILE_FLAGS = 
 
-CFLAGS = -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
 LOCAL_CFLAGS = 
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 

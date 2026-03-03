@@ -29,7 +29,7 @@
 MACHINE="x86_64"
 OS="linux-gnu"
 CC="gcc"
-CFLAGS="-g -O2"
+CFLAGS="-g -Wall -Wextra -Wdeprecated-non-prototype -O3"
 RELEASE="5.2"
 PATCHLEVEL="!PATCHLEVEL!"
 RELSTATUS="release"

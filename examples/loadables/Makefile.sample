@@ -19,7 +19,7 @@
 
 # these should match the ones in Makefile.in (for the make install target)
 
-prefix = /usr/local
+prefix = 
 exec_prefix = ${prefix}
 libdir = ${exec_prefix}/lib
 

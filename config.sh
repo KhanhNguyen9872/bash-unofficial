@@ -1,0 +1,5 @@
+BASH_VERSION="5.2.0(1)-release"
+BASH_MACHTYPE="x86_64-pc-linux-gnu"
+BASH_COPYRIGHT="Copyright (C) 2022 Free Software Foundation, Inc."
+BASH_LICENSE="License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+BASH_WARRANTY="This is free software; you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."

@@ -19,7 +19,7 @@
 #
 
 # Include some boilerplate Gnu makefile definitions.
-prefix = /usr/local
+prefix = 
 exec_prefix = ${prefix}
 
 bindir = ${exec_prefix}/bin
@@ -30,7 +30,7 @@ includedir = ${prefix}/include
 datarootdir = ${prefix}/share
 
 topdir = ../../..
-BUILD_DIR = /mnt/c/Users/khanhnguyen9872/Documents/GitHub/bash
+BUILD_DIR = /home/user/Desktop/bash-unofficial
 srcdir = .
 
 
@@ -42,7 +42,7 @@ SHELL = /bin/sh
 
 PERL5 = perl5
 
-CFLAGS = -g -O2
+CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
 
 #
 # These values are generated for configure by ${topdir}/support/shobj-conf.
