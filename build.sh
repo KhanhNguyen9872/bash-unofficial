@@ -64,6 +64,8 @@ if [ -f ./bash ]; then
         chmod 755 "$bash_path"
         printf "\nInstalled! Please restart the shell to make it work!\n"
         exit 0
+    else
+        printf "\nYou can use it via ./bash, or do whatever you want with the binary.\n"
     fi
 else
     printf "\nBuild process failed!\n"
