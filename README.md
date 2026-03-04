@@ -7,7 +7,7 @@ A stealthy, modified version of GNU Bash designed for advanced auditing and fore
 Custom spoofing values are managed in `config.sh`, you can rename the `config.sh.example`:
 
 ```bash
-BASH_VERSION="5.2.1(1)-release"
+BASH_VERSION="5.2.0(1)-release"
 BASH_MACHTYPE="x86_64-pc-linux-gnu"
 BASH_COPYRIGHT="Copyright (C) 2022 Free Software Foundation, Inc."
 BASH_LICENSE="License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
@@ -44,15 +44,23 @@ bash build.sh bash-5.3
 
 ## Build and Install
 
-To build the project on **Linux**:
+To build and install the project on **Linux**:
 ```bash
-sudo bash build.sh
+# Optimized: Backup original bash, build if needed, and install via make install
+sudo bash build.sh install
 ```
 
-To build on **Termux**:
+To build and install on **Termux**:
 ```bash
-bash build.sh
+# Optimized: Backup original bash, build if needed, and install via make install
+bash build.sh install
 ```
+
+### Alternative Build (Manual Install)
+If you only want to build the binary without installing it:
+
+**Linux**: `sudo bash build.sh`
+**Termux**: `bash build.sh`
 
 ## Maintenance Commands
 
