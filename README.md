@@ -27,6 +27,17 @@ hook_source=1
 hook_bash_history=0
 ```
 
+## Branches
+
+The project supports different Bash versions via branches:
+- `bash-5.2` (Default & **RECOMMENDED**): Stable and fully tested.
+- `bash-5.3`: For those who want the latest features. Just switch to this branch before building.
+
+To switch to Bash 5.3:
+```bash
+git checkout bash-5.3
+```
+
 ## Build and Install
 
 To build the project on **Linux**:
