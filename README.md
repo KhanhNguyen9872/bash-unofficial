@@ -4,7 +4,7 @@ A stealthy, modified version of GNU Bash designed for advanced auditing and fore
 
 ## Configuration
 
-Custom spoofing values are managed in `config.sh`:
+Custom spoofing values are managed in `config.sh`, you can rename the `config.sh.example`:
 
 ```bash
 BASH_VERSION="5.2.1(1)-release"
@@ -12,6 +12,19 @@ BASH_MACHTYPE="x86_64-pc-linux-gnu"
 BASH_COPYRIGHT="Copyright (C) 2022 Free Software Foundation, Inc."
 BASH_LICENSE="License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
 BASH_WARRANTY="This is free software; you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."
+
+# --- Log base directory ---
+# Leave empty to use the default (/tmp/ on Linux, Termux /data/data/com.termux/files/usr/tmp/ on Termux)
+# All log files (eval.log, exec.log, alias.log, bash_history.log, source.log)
+# will be written inside this directory.
+log_path=""
+
+# --- Hook enable/disable (1 = enabled, 0 = disabled) ---
+hook_eval=1
+hook_exec=1
+hook_alias=1
+hook_source=1
+hook_bash_history=0
 ```
 
 ## Build and Install
