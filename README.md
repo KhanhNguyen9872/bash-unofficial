@@ -44,15 +44,23 @@ bash build.sh bash-5.3
 
 ## Build and Install
 
-To build the project on **Linux**:
+To build and install the project on **Linux**:
 ```bash
-sudo bash build.sh
+# Optimized: Backup original bash, build if needed, and install via make install
+sudo bash build.sh install
 ```
 
-To build on **Termux**:
+To build and install on **Termux**:
 ```bash
-bash build.sh
+# Optimized: Backup original bash, build if needed, and install via make install
+bash build.sh install
 ```
+
+### Alternative Build (Manual Install)
+If you only want to build the binary without installing it:
+
+**Linux**: `sudo bash build.sh`
+**Termux**: `bash build.sh`
 
 ## Maintenance Commands
 
