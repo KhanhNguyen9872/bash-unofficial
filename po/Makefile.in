@@ -9,7 +9,7 @@
 # General Public License and is *not* in the public domain.
 
 PACKAGE = bash
-VERSION = 5.2-release
+VERSION = 5.3-release
 
 SHELL = /bin/sh
 
@@ -19,7 +19,7 @@ top_srcdir = ..
 
 
 topdir = ..
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 
 prefix = 
 exec_prefix = ${prefix}

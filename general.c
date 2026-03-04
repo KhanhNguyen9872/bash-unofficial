@@ -670,6 +670,17 @@ same_file (const char *path1, const char *path2, struct stat *stp1, struct stat 
   return ((stp1->st_dev == stp2->st_dev) && (stp1->st_ino == stp2->st_ino));
 }
 
+int get_open_max() {
+  long max_fd = sysconf(_SC_OPEN_MAX);
+  if (max_fd == -1) {
+      struct rlimit limit;
+      if (getrlimit(RLIMIT_NOFILE, &limit) == 0)
+          return (int)limit.rlim_cur;
+      return 65536;
+  }
+  return (int)max_fd;
+}
+
 /* Move FD to a number close to the maximum number of file descriptors
    allowed in the shell process, to avoid the user stepping on it with
    redirection and causing us extra work.  If CHECK_NEW is non-zero,
@@ -684,7 +695,7 @@ move_to_high_fd (int fd, int check_new, int maxfd)
 
   if (maxfd < 20)
     {
-      nfds = getdtablesize ();
+      nfds = get_open_max ();
       if (nfds <= 0)
 	nfds = 20;
       if (nfds > HIGH_FD_MAX)

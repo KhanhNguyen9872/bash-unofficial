@@ -63,7 +63,7 @@ struct builtin static_shell_builtins[] = {
      N_("caller [expr]"), (char *)NULL },
 #endif /* DEBUGGER */
   { "cd", cd_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, cd_doc,
-     N_("cd [-L|[-P [-e]] [-@]] [dir]"), (char *)NULL },
+     N_("cd [-L|[-P [-e]]] [-@] [dir]"), (char *)NULL },
   { "pwd", pwd_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, pwd_doc,
      N_("pwd [-LP]"), (char *)NULL },
   { ":", colon_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, colon_doc,
@@ -112,7 +112,7 @@ struct builtin static_shell_builtins[] = {
   { "bg", bg_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, bg_doc,
      N_("bg [job_spec ...]"), (char *)NULL },
 #endif /* JOB_CONTROL */
-  { "hash", hash_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, hash_doc,
+  { "hash", hash_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, hash_doc,
      N_("hash [-lr] [-p pathname] [-dt] [name ...]"), (char *)NULL },
 #if defined (HELP_BUILTIN)
   { "help", help_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, help_doc,
@@ -135,7 +135,7 @@ struct builtin static_shell_builtins[] = {
   { "let", let_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | ARRAYREF_BUILTIN, let_doc,
      N_("let arg [arg ...]"), (char *)NULL },
   { "read", read_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN | ARRAYREF_BUILTIN, read_doc,
-     N_("read [-ers] [-a array] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]"), (char *)NULL },
+     N_("read [-Eers] [-a array] [-d delim] [-i text] [-n nchars] [-N nchars] [-p prompt] [-t timeout] [-u fd] [name ...]"), (char *)NULL },
   { "return", return_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, return_doc,
      N_("return [n]"), (char *)NULL },
   { "set", set_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, set_doc,
@@ -143,15 +143,15 @@ struct builtin static_shell_builtins[] = {
   { "unset", unset_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN | ARRAYREF_BUILTIN, unset_doc,
      N_("unset [-f] [-v] [-n] [name ...]"), (char *)NULL },
   { "export", export_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN | ASSIGNMENT_BUILTIN, export_doc,
-     N_("export [-fn] [name[=value] ...] or export -p"), (char *)NULL },
+     N_("export [-fn] [name[=value] ...] or export -p [-f]"), (char *)NULL },
   { "readonly", readonly_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN | ASSIGNMENT_BUILTIN, readonly_doc,
      N_("readonly [-aAf] [name[=value] ...] or readonly -p"), (char *)NULL },
   { "shift", shift_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, shift_doc,
      N_("shift [n]"), (char *)NULL },
   { "source", source_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, source_doc,
-     N_("source filename [arguments]"), (char *)NULL },
+     N_("source [-p path] filename [arguments]"), (char *)NULL },
   { ".", source_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, dot_doc,
-     N_(". filename [arguments]"), (char *)NULL },
+     N_(". [-p path] filename [arguments]"), (char *)NULL },
 #if defined (JOB_CONTROL)
   { "suspend", suspend_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, suspend_doc,
      N_("suspend [-f]"), (char *)NULL },
@@ -163,11 +163,11 @@ struct builtin static_shell_builtins[] = {
   { "times", times_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, times_doc,
      "times", (char *)NULL },
   { "trap", trap_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | SPECIAL_BUILTIN, trap_doc,
-     N_("trap [-lp] [[arg] signal_spec ...]"), (char *)NULL },
-  { "type", type_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, type_doc,
+     N_("trap [-Plp] [[action] signal_spec ...]"), (char *)NULL },
+  { "type", type_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, type_doc,
      N_("type [-afptP] name [name ...]"), (char *)NULL },
 #if !defined (_MINIX)
-  { "ulimit", ulimit_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, ulimit_doc,
+  { "ulimit", ulimit_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, ulimit_doc,
      N_("ulimit [-SHabcdefiklmnpqrstuvxPRT] [limit]"), (char *)NULL },
 #endif /* !_MINIX */
   { "umask", umask_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN, umask_doc,
@@ -180,6 +180,8 @@ struct builtin static_shell_builtins[] = {
   { "wait", wait_builtin, BUILTIN_ENABLED | STATIC_BUILTIN | POSIX_BUILTIN | ARRAYREF_BUILTIN, wait_doc,
      N_("wait [pid ...]"), (char *)NULL },
 #endif /* !JOB_CONTROL */
+  { "!", (sh_builtin_func_t *)0x0, BUILTIN_ENABLED | STATIC_BUILTIN, bang_doc,
+     N_("! PIPELINE"), (char *)NULL },
   { "for", (sh_builtin_func_t *)0x0, BUILTIN_ENABLED | STATIC_BUILTIN, for_doc,
      N_("for NAME [in WORDS ... ] ; do COMMANDS; done"), (char *)NULL },
   { "for ((", (sh_builtin_func_t *)0x0, BUILTIN_ENABLED | STATIC_BUILTIN, arith_for_doc,
@@ -232,7 +234,7 @@ struct builtin static_shell_builtins[] = {
 #endif /* PROGRAMMABLE_COMPLETION */
 #if defined (PROGRAMMABLE_COMPLETION)
   { "compgen", compgen_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, compgen_doc,
-     N_("compgen [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-W wordlist] [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]"), (char *)NULL },
+     N_("compgen [-V varname] [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-W wordlist] [-F function] [-C command] [-X filterpat] [-P prefix] [-S suffix] [word]"), (char *)NULL },
 #endif /* PROGRAMMABLE_COMPLETION */
 #if defined (PROGRAMMABLE_COMPLETION)
   { "compopt", compopt_builtin, BUILTIN_ENABLED | STATIC_BUILTIN, compopt_doc,
@@ -318,6 +320,9 @@ N_("Set Readline key bindings and variables.\n\
     				KEYSEQ is entered.\n\
       -X                 List key sequences bound with -x and associated commands\n\
                          in a form that can be reused as input.\n\
+    \n\
+    If arguments remain after option processing, the -p and -P options treat\n\
+    them as readline command names and restrict output to those names.\n\
     \n\
     Exit Status:\n\
     bind returns 0 unless an unrecognized option is given or an error occurs."),
@@ -477,7 +482,8 @@ N_("Execute a simple command or display information about commands.\n\
     Options:\n\
       -p    use a default value for PATH that is guaranteed to find all of\n\
             the standard utilities\n\
-      -v    print a description of COMMAND similar to the `type' builtin\n\
+      -v    print a single word indicating the command or filename that\n\
+            invokes COMMAND\n\
       -V    print a more verbose description of each COMMAND\n\
     \n\
     Exit Status:\n\
@@ -513,7 +519,8 @@ N_("Set variable values and attributes.\n\
       -u	to convert the value of each NAME to upper case on assignment\n\
       -x	to make NAMEs export\n\
     \n\
-    Using `+' instead of `-' turns off the given attribute.\n\
+    Using `+' instead of `-' turns off the given attribute, except for a,\n\
+    A, and r.\n\
     \n\
     Variables with the integer attribute have arithmetic evaluation (see\n\
     the `let' command) performed when the variable is assigned a value.\n\
@@ -541,6 +548,9 @@ N_("Define local variables.\n\
     \n\
     Create a local variable called NAME, and give it VALUE.  OPTION can\n\
     be any option accepted by `declare'.\n\
+    \n\
+    If any NAME is \"-\", local saves the set of shell options and restores\n\
+    them when the function returns.\n\
     \n\
     Local variables can only be used within a function; they are visible\n\
     only to the function where they are defined and its children.\n\
@@ -626,6 +636,11 @@ N_("Enable and disable shell builtins.\n\
       -d	Remove a builtin loaded with -f\n\
     \n\
     Without options, each NAME is enabled.\n\
+    \n\
+    On systems with dynamic loading, the shell variable BASH_LOADABLES_PATH\n\
+    defines a search path for the directory containing FILENAMEs that do\n\
+    not contain a slash. It may include \".\" to force a search of the current\n\
+    directory.\n\
     \n\
     To use the `test' found in $PATH instead of the shell builtin\n\
     version, type `enable -n test'.\n\
@@ -752,6 +767,8 @@ N_("Display or execute commands from the history list.\n\
     runs the last command beginning with `cc' and typing `r' re-executes\n\
     the last command.\n\
     \n\
+    The history builtin also operates on the history list.\n\
+    \n\
     Exit Status:\n\
     Returns success or status of executed command; non-zero if an error occurs."),
 #endif /* HELP_BUILTIN */
@@ -848,6 +865,8 @@ N_("Display or manipulate the history list.\n\
       -c	clear the history list by deleting all of the entries\n\
       -d offset	delete the history entry at position OFFSET. Negative\n\
     		offsets count back from the end of the history list\n\
+      -d start-end	delete the history entries beginning at position START\n\
+    		through position END.\n\
     \n\
       -a	append history lines from this session to the history file\n\
       -n	read all history lines not already read from the history file\n\
@@ -861,7 +880,11 @@ N_("Display or manipulate the history list.\n\
       -s	append the ARGs to the history list as a single entry\n\
     \n\
     If FILENAME is given, it is used as the history file.  Otherwise,\n\
-    if HISTFILE has a value, that is used, else ~/.bash_history.\n\
+    if HISTFILE has a value, that is used. If FILENAME is not supplied\n\
+    and HISTFILE is unset or null, the -a, -n, -r, and -w options have\n\
+    no effect and return success.\n\
+    \n\
+    The fc builtin also operates on the history list.\n\
     \n\
     If the HISTTIMEFORMAT variable is set and not null, its value is used\n\
     as a format string for strftime(3) to print the time stamp associated\n\
@@ -1009,6 +1032,8 @@ N_("Read a line from the standard input and split it into fields.\n\
       -d delim	continue until the first character of DELIM is read, rather\n\
     		than newline\n\
       -e	use Readline to obtain the line\n\
+      -E	use Readline to obtain the line and use the bash default\n\
+    		completion instead of Readline's default completion\n\
       -i text	use TEXT as the initial text for Readline\n\
       -n nchars	return after reading NCHARS characters rather than waiting\n\
     		for a newline, but honor a delimiter if fewer than\n\
@@ -1124,6 +1149,10 @@ N_("Set or unset values of shell options and positional parameters.\n\
       -   Assign any remaining arguments to the positional parameters.\n\
           The -x and -v options are turned off.\n\
     \n\
+    If -o is supplied with no option-name, set prints the current shell\n\
+    option settings. If +o is supplied with no option-name, set prints a\n\
+    series of set commands to recreate the current option settings.\n\
+    \n\
     Using + rather than - causes these flags to be turned off.  The\n\
     flags can also be used upon invocation of the shell.  The current\n\
     set of flags may be found in $-.  The remaining n ARGs are positional\n\
@@ -1167,7 +1196,7 @@ N_("Set export attribute for shell variables.\n\
     Options:\n\
       -f	refer to shell functions\n\
       -n	remove the export property from each NAME\n\
-      -p	display a list of all exported variables and functions\n\
+      -p	display a list of all exported variables or functions\n\
     \n\
     An argument of `--' disables further option processing.\n\
     \n\
@@ -1214,10 +1243,11 @@ char * const source_doc[] = {
 #if defined (HELP_BUILTIN)
 N_("Execute commands from a file in the current shell.\n\
     \n\
-    Read and execute commands from FILENAME in the current shell.  The\n\
-    entries in $PATH are used to find the directory containing FILENAME.\n\
-    If any ARGUMENTS are supplied, they become the positional parameters\n\
-    when FILENAME is executed.\n\
+    Read and execute commands from FILENAME in the current shell. If the\n\
+    -p option is supplied, the PATH argument is treated as a colon-\n\
+    separated list of directories to search for FILENAME. If -p is not\n\
+    supplied, $PATH is searched to find FILENAME. If any ARGUMENTS are\n\
+    supplied, they become the positional parameters when FILENAME is executed.\n\
     \n\
     Exit Status:\n\
     Returns the status of the last command executed in FILENAME; fails if\n\
@@ -1229,10 +1259,11 @@ char * const dot_doc[] = {
 #if defined (HELP_BUILTIN)
 N_("Execute commands from a file in the current shell.\n\
     \n\
-    Read and execute commands from FILENAME in the current shell.  The\n\
-    entries in $PATH are used to find the directory containing FILENAME.\n\
-    If any ARGUMENTS are supplied, they become the positional parameters\n\
-    when FILENAME is executed.\n\
+    Read and execute commands from FILENAME in the current shell. If the\n\
+    -p option is supplied, the PATH argument is treated as a colon-\n\
+    separated list of directories to search for FILENAME. If -p is not\n\
+    supplied, $PATH is searched to find FILENAME. If any ARGUMENTS are\n\
+    supplied, they become the positional parameters when FILENAME is executed.\n\
     \n\
     Exit Status:\n\
     Returns the status of the last command executed in FILENAME; fails if\n\
@@ -1369,25 +1400,32 @@ N_("Trap signals and other events.\n\
     Defines and activates handlers to be run when the shell receives signals\n\
     or other conditions.\n\
     \n\
-    ARG is a command to be read and executed when the shell receives the\n\
-    signal(s) SIGNAL_SPEC.  If ARG is absent (and a single SIGNAL_SPEC\n\
+    ACTION is a command to be read and executed when the shell receives the\n\
+    signal(s) SIGNAL_SPEC.  If ACTION is absent (and a single SIGNAL_SPEC\n\
     is supplied) or `-', each specified signal is reset to its original\n\
-    value.  If ARG is the null string each SIGNAL_SPEC is ignored by the\n\
+    value.  If ACTION is the null string each SIGNAL_SPEC is ignored by the\n\
     shell and by the commands it invokes.\n\
     \n\
-    If a SIGNAL_SPEC is EXIT (0) ARG is executed on exit from the shell.  If\n\
-    a SIGNAL_SPEC is DEBUG, ARG is executed before every simple command.  If\n\
-    a SIGNAL_SPEC is RETURN, ARG is executed each time a shell function or a\n\
-    script run by the . or source builtins finishes executing.  A SIGNAL_SPEC\n\
-    of ERR means to execute ARG each time a command's failure would cause the\n\
-    shell to exit when the -e option is enabled.\n\
+    If a SIGNAL_SPEC is EXIT (0) ACTION is executed on exit from the shell.\n\
+    If a SIGNAL_SPEC is DEBUG, ACTION is executed before every simple command\n\
+    and selected other commands. If a SIGNAL_SPEC is RETURN, ACTION is\n\
+    executed each time a shell function or a script run by the . or source\n\
+    builtins finishes executing.  A SIGNAL_SPEC of ERR means to execute ACTION\n\
+    each time a command's failure would cause the shell to exit when the -e\n\
+    option is enabled.\n\
     \n\
     If no arguments are supplied, trap prints the list of commands associated\n\
-    with each signal.\n\
+    with each trapped signal in a form that may be reused as shell input to\n\
+    restore the same signal dispositions.\n\
     \n\
     Options:\n\
       -l	print a list of signal names and their corresponding numbers\n\
-      -p	display the trap commands associated with each SIGNAL_SPEC\n\
+      -p	display the trap commands associated with each SIGNAL_SPEC in a\n\
+    		form that may be reused as shell input; or for all trapped\n\
+    		signals if no arguments are supplied\n\
+      -P	display the trap commands associated with each SIGNAL_SPEC. At least\n\
+    		one SIGNAL_SPEC must be supplied. -P and -p cannot be used\n\
+    		together.\n\
     \n\
     Each SIGNAL_SPEC is either a signal name in <signal.h> or a signal number.\n\
     Signal names are case insensitive and the SIG prefix is optional.  A\n\
@@ -1470,9 +1508,13 @@ N_("Modify shell resource limits.\n\
     Otherwise, the current value of the specified resource is printed.  If\n\
     no option is given, then -f is assumed.\n\
     \n\
-    Values are in 1024-byte increments, except for -t, which is in seconds,\n\
-    -p, which is in increments of 512 bytes, and -u, which is an unscaled\n\
-    number of processes.\n\
+    Values are in 1024-byte increments, except for -t, which is in seconds;\n\
+    -p, which is in increments of 512 bytes; -R, which is in microseconds;\n\
+    -b, which is in bytes; and -e, -i, -k, -n, -q, -r, -u, -x, and -P,\n\
+    which accept unscaled values.\n\
+    \n\
+    When in posix mode, values supplied with -c and -f are in 512-byte\n\
+    increments.\n\
     \n\
     Exit Status:\n\
     Returns success unless an invalid option is supplied or an error occurs."),
@@ -1546,6 +1588,16 @@ N_("Wait for process completion and return exit status.\n\
   (char *)NULL
 };
 #endif /* !JOB_CONTROL */
+char * const bang_doc[] = {
+#if defined (HELP_BUILTIN)
+N_("Execute PIPELINE, which can be a simple command, and negate PIPELINE's\n\
+    return status.\n\
+    \n\
+    Exit Status:\n\
+    The logical negation of PIPELINE's return status."),
+#endif /* HELP_BUILTIN */
+  (char *)NULL
+};
 char * const for_doc[] = {
 #if defined (HELP_BUILTIN)
 N_("Execute commands for each member in a list.\n\
@@ -1949,8 +2001,8 @@ N_("Formats and prints ARGUMENTS under control of the FORMAT.\n\
     format specifications, each of which causes printing of the next successive\n\
     argument.\n\
     \n\
-    In addition to the standard format specifications described in printf(1),\n\
-    printf interprets:\n\
+    In addition to the standard format characters csndiouxXeEfFgGaA described\n\
+    in printf(3), printf interprets:\n\
     \n\
       %b	expand backslash escape sequences in the corresponding argument\n\
       %q	quote the argument in a way that can be reused as shell input\n\
@@ -1976,8 +2028,8 @@ char * const complete_doc[] = {
 N_("Specify how arguments are to be completed by Readline.\n\
     \n\
     For each NAME, specify how arguments are to be completed.  If no options\n\
-    are supplied, existing completion specifications are printed in a way that\n\
-    allows them to be reused as input.\n\
+    or NAMEs are supplied, display existing completion specifications in a way\n\
+    that allows them to be reused as input.\n\
     \n\
     Options:\n\
       -p	print existing completion specifications in a reusable format\n\
@@ -2006,8 +2058,11 @@ char * const compgen_doc[] = {
 N_("Display possible completions depending on the options.\n\
     \n\
     Intended to be used from within a shell function generating possible\n\
-    completions.  If the optional WORD argument is supplied, matches against\n\
-    WORD are generated.\n\
+    completions.  If the optional WORD argument is present, generate matches\n\
+    against WORD.\n\
+    \n\
+    If the -V option is supplied, store the possible completions in the indexed\n\
+    array VARNAME instead of printing them to the standard output.\n\
     \n\
     Exit Status:\n\
     Returns success unless an invalid option is supplied or an error occurs."),

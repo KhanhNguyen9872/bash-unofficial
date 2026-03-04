@@ -8,9 +8,10 @@ libdir=${exec_prefix}/lib
 loadablesdir=${libdir}/bash
 headersdir=${includedir}/bash
 
-LOCAL_CFLAGS = 
+DEFS = -DHAVE_CONFIG_H
 LOCAL_DEFS = -DSHELL
-CCFLAGS = ${LOCAL_DEFS} ${LOCAL_CFLAGS}
+LOCAL_CFLAGS = 
+CCFLAGS = ${DEFS} ${LOCAL_DEFS} ${LOCAL_CFLAGS}
 
 CC = gcc
 SHOBJ_CC = gcc
@@ -22,7 +23,7 @@ SHOBJ_LIBS =
 
 Name: bash
 Description: Bash headers for bash loadable builtins
-Version: 5.2-release
+Version: 5.3-release
 Url: 
 Libs: ${SHOBJ_LIBS}
 Cflags: ${SHOBJ_CFLAGS} ${CCFLAGS} -I${headersdir} -I${headersdir}/builtins -I${headersdir}/include

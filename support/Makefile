@@ -30,7 +30,7 @@
 topdir = ..
 srcdir = .
 
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 
 RM	= rm -f
 SHELL	= /bin/sh
@@ -44,9 +44,8 @@ EXEEXT =
 #
 PROFILE_FLAGS = 
 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
-CFLAGS_FOR_BUILD = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
-BASE_CFLAGS_FOR_BUILD = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra  -O3
+CFLAGS_FOR_BUILD = -g -Wall -Wextra  -O3
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
 LOCAL_CFLAGS = 
@@ -63,7 +62,7 @@ LDFLAGS_FOR_BUILD = $(LDFLAGS) $(LOCAL_LDFLAGS) $(CFLAGS_FOR_BUILD)
 
 INCLUDES = -I${BUILD_DIR} -I${topdir}
 
-BASE_CCFLAGS = ${PROFILE_FLAGS} $(DEFS) $(LOCAL_DEFS) $(SYSTEM_FLAGS) \
+BASE_CCFLAGS = ${PROFILE_FLAGS} $(DEFS) $(LOCAL_DEFS) \
 	  ${INCLUDES} $(STYLE_CFLAGS) $(LOCAL_CFLAGS)
 
 CCFLAGS = $(BASE_CCFLAGS) $(CPPFLAGS) $(CFLAGS)

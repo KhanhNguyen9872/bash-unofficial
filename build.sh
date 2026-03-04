@@ -1,3 +1,4 @@
+#!/bin/bash
 if [[ "$PREFIX" != "/data/data/com.termux/files/usr" ]]; then
     if [ "$(id -u)" -ne 0 ]; then
         echo "This script must be run as root user!"
@@ -27,6 +28,7 @@ find . -name "Makefile" -not -path "*/examples/*" -not -path "*/po/*" \
 
 chmod 777 ./configure
 make clean
+sed -i 's/-Wdeprecated-non-prototype//g' configure
 ./configure --prefix=$PREFIX
 
 if [ -f ./config.sh ]; then

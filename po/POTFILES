@@ -12,6 +12,7 @@
      ../builtins/declare.def \
      ../builtins/enable.def \
      ../builtins/evalfile.c \
+     ../builtins/evalstring.c \
      ../builtins/exec.def \
      ../builtins/exit.def \
      ../builtins/fc.def \
@@ -20,7 +21,6 @@
      ../builtins/hash.def \
      ../builtins/help.def \
      ../builtins/history.def \
-     ../builtins/inlib.def \
      ../builtins/jobs.def \
      ../builtins/kill.def \
      ../builtins/let.def \
@@ -36,6 +36,7 @@
      ../builtins/shopt.def \
      ../builtins/source.def \
      ../builtins/suspend.def \
+     ../builtins/test.def \
      ../builtins/type.def \
      ../builtins/ulimit.def \
      ../builtins/umask.def \
@@ -46,11 +47,8 @@
      ../general.c \
      ../input.c \
      ../jobs.c \
-     ../lib/intl/os2compat.c \
      ../lib/malloc/malloc.c \
-     ../lib/malloc/stats.c \
      ../lib/malloc/table.c \
-     ../lib/malloc/watch.c \
      ../lib/sh/fmtulong.c \
      ../lib/sh/netopen.c \
      ../locale.c \
@@ -58,6 +56,7 @@
      ../make_cmd.c \
      ../nojobs.c \
      ../parse.y \
+     ../pathexp.c \
      ../pcomplete.c \
      ../pcomplib.c \
      ../print_cmd.c \
@@ -68,7 +67,8 @@
      ../subst.c \
      ../test.c \
      ../trap.c \
+     ../unwind_prot.c \
      ../variables.c \
      ../version.c \
-     ../version2.c \
-     ../xmalloc.c
+     ../xmalloc.c \
+     ../lib/intl/plural.c

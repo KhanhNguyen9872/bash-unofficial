@@ -22,7 +22,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 
 libdir = ${exec_prefix}/lib
 
@@ -40,7 +40,7 @@ MV = mv
 
 SHELL = /bin/sh
 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra  -O3
 CPPFLAGS = 
 LDFLAGS = 
 

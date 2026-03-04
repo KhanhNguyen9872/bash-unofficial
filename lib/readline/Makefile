@@ -4,7 +4,7 @@
 #								            #
 #############################################################################
 
-# Copyright (C) 1994-2012 Free Software Foundation, Inc.
+# Copyright (C) 1994-2024 Free Software Foundation, Inc.
 
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
@@ -20,17 +20,17 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 PACKAGE = bash
-VERSION = 5.2-release
+VERSION = 5.3-release
 
 PACKAGE_BUGREPORT = bug-bash@gnu.org
 PACKAGE_NAME = bash
-PACKAGE_STRING = bash 5.2-release
-PACKAGE_VERSION = 5.2-release
+PACKAGE_STRING = bash 5.3-release
+PACKAGE_VERSION = 5.3-release
 
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 
 datarootdir = ${prefix}/share
 
@@ -54,7 +54,9 @@ CTAGS = ctags -tw
 
 DEBUG = 
 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+ADDON_CFLAGS = 
+
+CFLAGS = -g -Wall -Wextra  -O3
 LOCAL_CFLAGS =  ${DEBUG}
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 
@@ -137,7 +139,7 @@ libhistory.a: $(HISTOBJ) xmalloc.o xfree.o
 
 documentation: force
 	test -d doc || mkdir doc
-	-( cd doc && $(MAKE) $(MFLAGS) )
+	-( cd doc && $(MAKE) $(BASH_MAKEFLAGS) )
 
 # Since tilde.c is shared between readline and bash, make sure we compile
 # it with the right flags when it's built as part of readline
@@ -159,15 +161,17 @@ TAGS:	force
 tags:	force
 	$(CTAGS) $(CSOURCES) $(HSOURCES)
 
-clean:	force
-	$(RM) $(OBJECTS) *.a
-	-( cd doc && $(MAKE) $(MFLAGS) $@ )
+.PHONY: clean maintainer-clean distclean mostlyclean 
 
-mostlyclean: clean
-	-( cd doc && $(MAKE) $(MFLAGS) $@ )
+mostlyclean:	force
+	$(RM) $(OBJECTS) *.a
+	-( cd doc && $(MAKE) $(BASH_MAKEFLAGS) $@ )
+
+clean: mostlyclean
+	-( cd doc && $(MAKE) $(BASH_MAKEFLAGS) $@ )
 
 distclean maintainer-clean: clean
-	-( cd doc && $(MAKE) $(MFLAGS) $@ )
+	-( cd doc && $(MAKE) $(BASH_MAKEFLAGS) $@ )
 	$(RM) Makefile
 	$(RM) TAGS tags
 
@@ -281,6 +285,9 @@ colors.o: ansi_stdlib.h posixstat.h
 parse-colors.o: ${BUILD_DIR}/config.h colors.h parse-colors.h
 parse-colors.o: rldefs.h rlconf.h
 parse-colors.o: readline.h keymaps.h rltypedefs.h chardefs.h tilde.h rlstdc.h
+
+input.o: posixselect.h posixtime.h
+parens.o: posixselect.h posixtime.h
 
 bind.o: rlshell.h
 histfile.o: rlshell.h

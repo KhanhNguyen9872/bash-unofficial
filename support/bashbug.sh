@@ -29,8 +29,8 @@
 MACHINE="x86_64"
 OS="linux-gnu"
 CC="gcc"
-CFLAGS="-g -Wall -Wextra -Wdeprecated-non-prototype -O3"
-RELEASE="5.2"
+CFLAGS="-g -Wall -Wextra  -O3"
+RELEASE="5.3"
 PATCHLEVEL="!PATCHLEVEL!"
 RELSTATUS="release"
 MACHTYPE="x86_64-pc-linux-gnu"
@@ -132,9 +132,9 @@ if [ -z "$DEFEDITOR" ] && [ -z "$EDITOR" ]; then
 		DEFEDITOR=emacs
 	elif [ -x /usr/bin/xemacs ]; then
 		DEFEDITOR=xemacs
-	elif [ -x /usr/bin/vim; then
+	elif [ -x /usr/bin/vim ]; then
 		DEFEDITOR=vim
-	elif [ -x /usr/bin/gvim; then
+	elif [ -x /usr/bin/gvim ]; then
 		DEFEDITOR=gvim
 	elif [ -x /usr/bin/nano ]; then
 		DEFEDITOR=nano

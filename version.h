@@ -2,7 +2,7 @@
    `make version.h' to the Makefile.  It is created by mkversion. */
 
 /* The distribution version number of this shell. */
-#define DISTVERSION "5.2"
+#define DISTVERSION "5.3"
 
 /* The last built version of this shell. */
 #define BUILDVERSION 1
@@ -11,7 +11,7 @@
 #define RELSTATUS "release"
 
 /* The default shell compatibility-level (the current version) */
-#define DEFAULT_COMPAT_LEVEL 52
+#define DEFAULT_COMPAT_LEVEL 53
 
 /* A version string for use by sccs and the what command. */
-#define SCCSVERSION "@(#)Bash version 5.2.0(1) release GNU"
+#define SCCSVERSION "@(#)Bash version 5.3.0(1) release GNU"

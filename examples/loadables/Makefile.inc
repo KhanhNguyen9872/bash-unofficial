@@ -18,10 +18,10 @@
 #
 
 PACKAGE = bash
-VERSION = 5.2-release
+VERSION = 5.3-release
 
 PACKAGE_NAME = bash
-PACKAGE_VERSION = 5.2-release
+PACKAGE_VERSION = 5.3-release
 
 # Include some boilerplate Gnu makefile definitions.
 prefix = 
@@ -38,7 +38,7 @@ loadablesdir = ${libdir}/bash
 headersdir = $(includedir)/$(PACKAGE_NAME)
 
 topdir = ../..
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 srcdir = .
 
 
@@ -61,7 +61,7 @@ host_os = linux-gnu
 host_cpu = x86_64
 host_vendor = pc
 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra  -O3
 LOCAL_CFLAGS = 
 DEFS = -DHAVE_CONFIG_H
 LOCAL_DEFS = -DSHELL

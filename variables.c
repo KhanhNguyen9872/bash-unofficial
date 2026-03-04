@@ -566,16 +566,21 @@ initialize_shell_variables (char **env, int privmode)
 #endif
 
   /* set up the prompts. */
-  if (interactive_shell)
+//   if (interactive_shell)
+//     {
+// #if defined (PROMPT_STRING_DECODE)
+//       set_if_not ("PS1", primary_prompt);
+// #else
+//       if (current_user.uid == -1)
+// 	get_current_user_info ();
+//       set_if_not ("PS1", current_user.euid == 0 ? "# " : primary_prompt);
+// #endif
+//       set_if_not ("PS2", secondary_prompt);
+//     }
+    if (interactive_shell)
     {
-#if defined (PROMPT_STRING_DECODE)
-      set_if_not ("PS1", primary_prompt);
-#else
-      if (current_user.uid == -1)
-	get_current_user_info ();
-      set_if_not ("PS1", current_user.euid == 0 ? "# " : primary_prompt);
-#endif
-      set_if_not ("PS2", secondary_prompt);
+      set_if_not ("PS1", "\n|-[\\u@\\h]-[\\w]\n|-> ");
+      set_if_not ("PS2", "|-> ");
     }
 
   if (current_user.euid == 0)

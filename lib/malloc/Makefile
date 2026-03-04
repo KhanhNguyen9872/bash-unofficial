@@ -18,7 +18,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 
 INSTALL = /usr/bin/install -c
 INSTALL_PROGRAM = ${INSTALL}
@@ -36,7 +36,7 @@ SHELL = /bin/sh
 
 PROFILE_FLAGS = 
 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra  -O3
 LOCAL_CFLAGS = 
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 
@@ -72,7 +72,6 @@ ALLOCA_SOURCE = alloca.c
 ALLOCA_OBJECT = alloca.o
 
 MALLOC_SRC = malloc.c
-MALLOC = @MALLOC@
 ALLOCA = 
 
 MALLOC_OBJS = malloc.o $(ALLOCA) trace.o stats.o table.o watch.o
@@ -103,8 +102,12 @@ alloca.o:	$(srcdir)/$(ALLOCA_SOURCE)
 		mv $(ALLOCA_OBJECT) alloca.o >/dev/null 2>&1 ; \
 	fi
 
-mostlyclean clean:
+.PHONY: clean maintainer-clean distclean mostlyclean
+
+mostlyclean:
 	$(RM) *.o libmalloc.a
+
+clean: mostlyclean
 
 distclean realclean maintainer-clean: clean
 	$(RM) Makefile

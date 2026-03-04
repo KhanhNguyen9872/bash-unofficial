@@ -1,7 +1,7 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h -- Configuration file for bash. */
 
-/* Copyright (C) 1987-2009,2011-2012,2013-2019 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2009,2011-2012,2013-2024 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -179,6 +179,9 @@
 /* Define to allow functions to be imported from the environment. */
 #define FUNCTION_IMPORT 1
 
+/* Define to make the `bash_source_fullpath' option enabled by default. */
+#define BASH_SOURCE_FULLPATH_DEFAULT 0
+
 /* Define AFS if you are using Transarc's AFS. */
 /* #undef AFS */
 
@@ -206,8 +209,8 @@
 /* Define if the compiler supports `long double' variables. */
 #define HAVE_LONG_DOUBLE 1
 
-#define PROTOTYPES 1
-#define __PROTOTYPES 1
+/* #undef PROTOTYPES */
+/* #undef __PROTOTYPES */
 
 /* #undef __CHAR_UNSIGNED__ */
 
@@ -239,6 +242,8 @@
 
 /* The number of bytes in a `wchar_t', if supported */
 #define SIZEOF_WCHAR_T 4
+
+/* #undef HAVE_C_BOOL */
 
 /* System paths */
 
@@ -346,8 +351,11 @@
 /* #undef uintmax_t */
 
 /* Define to integer type wide enough to hold a pointer if <stdint.h> doesn't define. */
+/* #undef intptr_t */
+
+/* Define to unsigned integer type wide enough to hold a pointer if <stdint.h> doesn't define. */
 /* #undef uintptr_t */
- 
+
 /* Define to `int' if <sys/types.h> doesn't define.  */
 /* #undef uid_t */
 
@@ -427,6 +435,8 @@
 
 /* #undef HAVE_STRUCT_DIRENT_D_NAMLEN */
 
+#define HAVE_STRUCT_DIRENT_D_TYPE 1
+
 /* #undef TIOCSTAT_IN_SYS_IOCTL */
 
 #define FIONREAD_IN_SYS_IOCTL 1
@@ -478,6 +488,8 @@
 /* Define if you have <linux/audit.h> and it defines AUDIT_USER_TTY */
 #define HAVE_DECL_AUDIT_USER_TTY 1
 
+#define HAVE_DECL_BRK 1
+
 #define HAVE_DECL_CONFSTR 1
 
 #define HAVE_DECL_PRINTF 1
@@ -505,6 +517,22 @@
 #define HAVE_DECL_STRTOUL 1
 #define HAVE_DECL_STRTOULL 1
 #define HAVE_DECL_STRTOUMAX 1
+
+/* These are checked with BASH_FUNC_UNLOCKED_IO */
+
+#define HAVE_DECL_CLEARERR_UNLOCKED 1
+#define HAVE_DECL_FEOF_UNLOCKED 1
+#define HAVE_DECL_FERROR_UNLOCKED 1
+#define HAVE_DECL_FFLUSH_UNLOCKED 1
+#define HAVE_DECL_FGETS_UNLOCKED 1
+#define HAVE_DECL_FPUTC_UNLOCKED 1
+#define HAVE_DECL_FPUTS_UNLOCKED 1
+#define HAVE_DECL_FREAD_UNLOCKED 1
+#define HAVE_DECL_FWRITE_UNLOCKED 1
+#define HAVE_DECL_GETC_UNLOCKED 1
+#define HAVE_DECL_GETCHAR_UNLOCKED 1
+#define HAVE_DECL_PUTC_UNLOCKED 1
+#define HAVE_DECL_PUTCHAR_UNLOCKED 1
 
 /* Characteristics of system calls and C library functions. */
 
@@ -572,11 +600,17 @@
 /* Define if you have the bcopy function.  */
 #define HAVE_BCOPY 1
 
+/* Define if you have the brk function. */
+/* #undef HAVE_BRK */
+
 /* Define if you have the bzero function.  */
 #define HAVE_BZERO 1
 
 /* Define if you have the chown function.  */
 #define HAVE_CHOWN 1
+
+/* Define if you have the clock_gettime function.  */
+#define HAVE_CLOCK_GETTIME 1
 
 /* Define if you have the confstr function.  */
 #define HAVE_CONFSTR 1
@@ -739,11 +773,17 @@
 /* Define if you have the mbscmp function. */
 /* #undef HAVE_MBSCMP */
 
+/* Define if you have the mbsncmp function. */
+/* #undef HAVE_MBSNCMP */
+
 /* Define if you have the mbsnrtowcs function. */
 #define HAVE_MBSNRTOWCS 1
 
 /* Define if you have the mbsrtowcs function. */
 #define HAVE_MBSRTOWCS 1
+
+/* Define if you have the memfd_create function.  */
+#define HAVE_MEMFD_CREATE 1
 
 /* Define if you have the memmove function.  */
 #define HAVE_MEMMOVE 1
@@ -823,6 +863,12 @@
 #define HAVE_SETRESUID 1
 /* #undef HAVE_DECL_SETRESUID */
 
+/* Define if you have the shm_open function.  */
+#define HAVE_SHM_OPEN 1
+
+/* Define if you have the shm_mkstemp function.  */
+/* #undef HAVE_SHM_MKSTEMP */
+
 /* Define if you have the setvbuf function.  */
 #define HAVE_SETVBUF 1
 
@@ -835,6 +881,9 @@
 /* Define if you have the snprintf function.  */
 #define HAVE_SNPRINTF 1
 
+/* Define if you have the statfs function.  */
+#define HAVE_STATFS 1
+
 /* Define if you have the strcasecmp function.  */
 #define HAVE_STRCASECMP 1
 
@@ -845,7 +894,7 @@
 #define HAVE_STRCHR 1
 
 /* Define if you have the strchrnul function.  */
-#define HAVE_STRCHRNUL 1
+/* #undef HAVE_STRCHRNUL */
 
 /* Define if you have the strcoll function.  */
 #define HAVE_STRCOLL 1
@@ -855,6 +904,9 @@
 
 /* Define if you have the strftime function. */
 #define HAVE_STRFTIME 1
+
+/* Define if you have the strlcat function. */
+#define HAVE_STRLCAT 1
 
 /* Define if you have the strnlen function. */
 #define HAVE_STRNLEN 1
@@ -900,6 +952,12 @@
 
 /* Define if you have the tcgetpgrp function.  */
 #define HAVE_TCGETPGRP 1
+
+/* Define if you have the tcgetwinsize function.  */
+/* #undef HAVE_TCGETWINSIZE */
+
+/* Define if you have the tcsetwinsize function.  */
+/* #undef HAVE_TCSETWINSIZE */
 
 /* Define if you have the times function.  */
 #define HAVE_TIMES 1
@@ -948,6 +1006,9 @@
 
 /* Define if you have the wcsdup function.  */
 #define HAVE_WCSDUP 1
+
+/* Define if you have the wcsnrtombs function.  */
+#define HAVE_WCSNRTOMBS 1
 
 /* Define if you have the wctype function.  */
 #define HAVE_WCTYPE 1
@@ -1015,7 +1076,7 @@
 #define HAVE_STDLIB_H 1
 
 /* Define if you have the <stdarg.h> header file.  */
-#define HAVE_STDARG_H 1
+/* #undef HAVE_STDARG_H */
 
 /* Define if you have the <string.h> header file.  */
 #define HAVE_STRING_H 1
@@ -1167,6 +1228,32 @@
 
 /* Additional defines for configuring lib/intl, maintained by autoscan/autoheader */
 
+/* System characteristics */
+/* #undef HAVE_LC_MESSAGE */
+/* #undef HAVE_LOCALE_NULL */
+/* #undef HAVE_NAMELESS_LOCALES */
+/* #undef HAVE_PER_THREAD_LOCALE */
+/* #undef HAVE_SOLARIS114_LOCALES */
+
+/* Compiler characteristics */
+#define FLEXIBLE_ARRAY_MEMBER /**/
+
+#define HAVE_VISIBILITY 1
+
+#define HAVE_BUILTIN_EXPECT 1
+
+#define HAVE_WEAK_SYMBOLS 1
+
+#define _GL_ATTRIBUTE_MALLOC
+#define _GL_ATTRIBUTE_DEALLOC_FREE
+#define _GL_ATTRIBUTE_FALLTHROUGH
+#define _GL_ATTRIBUTE_PURE
+#define _GL_UNUSED
+
+#define _GL_INLINE_HEADER_BEGIN
+#define _GL_INLINE_HEADER_END
+#define _GL_EXTERN_INLINE
+
 /* Define if you have the <argz.h> header file. */
 #define HAVE_ARGZ_H 1
 
@@ -1176,14 +1263,40 @@
 /* Define if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
+#define HAVE_INTTYPES_H_WITH_UINTMAX 1
+
 /* Define if you have the <malloc.h> header file. */
 #define HAVE_MALLOC_H 1
+
+#define HAVE_STDINT_H_WITH_UINTMAX 1
 
 /* Define if you have the <stdio_ext.h> header file. */
 #define HAVE_STDIO_EXT_H 1
 
+/* Define if you have the <threads.h> header file. */
+#define HAVE_THREADS_H 1
+
+/* Define if you have the <xlocale.h> header file.  */
+/* #undef HAVE_XLOCALE_H */
+
+/* Declarations */
+#define HAVE_DECL_FEOF_UNLOCKED 1
+#define HAVE_DECL_FGETS_UNLOCKED 1
+#define HAVE_DECL__SNPRINTF 0
+#define HAVE_DECL__SNWPRINTF 0
+
 /* Define if you have the `dcgettext' function. */
 #define HAVE_DCGETTEXT 1
+
+#define HAVE_GETUID 1
+#define HAVE_GETEUID 1
+
+#define HAVE_GETGID 1
+#define HAVE_GETEGID 1
+
+/* #undef HAVE_GETLOCALENAME_L */
+#define HAVE_GOOD_USELOCALE 1
+#define HAVE_ICONV 1
 
 /* Define if you have the `localeconv' function. */
 #define HAVE_LOCALECONV 1
@@ -1203,8 +1316,24 @@
 /* Define if you have the `munmap' function. */
 #define HAVE_MUNMAP 1
 
+/* Define if you have the `nanosleep' function. */
+#define HAVE_NANOSLEEP 1
+
+/* Define if you have the `newlocale' function. */
+#define HAVE_NEWLOCALE 1
+
 /* Define if you have the `nl_langinfo' function. */
-/* #undef HAVE_NL_LANGINFO */
+#define HAVE_NL_LANGINFO 1
+
+#define HAVE_POSIX_PRINTF 1
+
+#define HAVE_PTHREAD_API 1
+#define HAVE_PTHREAD_MUTEX_RECURSIVE 1
+#define HAVE_PTHREAD_RWLOCK 1
+/* #undef HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER */
+
+/* #undef HAVE_SNPRINTF_RETVAL_C99 */
+/* #undef HAVE_SNPRINTF_TRUNCATION_C99 */
 
 /* Define if you have the `stpcpy' function. */
 #define HAVE_STPCPY 1
@@ -1215,6 +1344,18 @@
 /* Define if you have the `strdup' function. */
 #define HAVE_STRDUP 1
 
+#define HAVE_TSEARCH 1
+
+/* Define if you have the `uselocale' function. */
+#define HAVE_USELOCALE 1
+#define HAVE_WORKING_USELOCALE 1
+
+#define HAVE_WCSLEN 1
+#define HAVE_WCSNLEN 1
+
+/* Define if you have the `wprintf' function. */
+#define HAVE_WPRINTF 1
+
 /* Define if you have the `__argz_count' function. */
 #define HAVE___ARGZ_COUNT 1
 
@@ -1223,6 +1364,14 @@
 
 /* Define if you have the `__argz_stringify' function. */
 #define HAVE___ARGZ_STRINGIFY 1
+
+#define HAVE___FSETLOCKING 1
+
+/* macOS specific defines */
+
+/* #undef HAVE_CFLOCALECOPYPREFERREDLANGUAGES */
+
+/* #undef HAVE_CFPREFERENCESCOPYAPPVALUE */
 
 /* End additions for lib/intl */
 

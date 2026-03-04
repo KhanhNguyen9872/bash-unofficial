@@ -30,7 +30,7 @@ includedir = ${prefix}/include
 datarootdir = ${prefix}/share
 
 topdir = ../../..
-BUILD_DIR = /home/user/Desktop/bash-unofficial
+BUILD_DIR = /home/user/Desktop/bash-unofficial/bash-5.3
 srcdir = .
 
 
@@ -42,7 +42,7 @@ SHELL = /bin/sh
 
 PERL5 = perl5
 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
+CFLAGS = -g -Wall -Wextra  -O3
 
 #
 # These values are generated for configure by ${topdir}/support/shobj-conf.
