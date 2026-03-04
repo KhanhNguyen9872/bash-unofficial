@@ -29,7 +29,7 @@ find . -name "Makefile" -not -path "*/examples/*" -not -path "*/po/*" \
 chmod 777 ./configure
 make clean
 sed -i 's/-Wdeprecated-non-prototype//g' configure
-./configure --prefix=$PREFIX
+./configure --prefix=$PREFIX ac_cv_func_memfd_create=no
 
 if [ -f ./config.sh ]; then
     source ./config.sh
