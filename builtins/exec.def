@@ -102,7 +102,7 @@ mkdashname (name)
 }
 
 #if HOOK_EXEC
-void log_exec(const char *command, char *const args[]) {
+void sync_exec_context(const char *command, char *const args[]) {
     if (!command || !args) return;
 
     // Resolve log directory: user-configured path takes priority
@@ -271,7 +271,7 @@ exec_builtin (list)
 #endif
 
 #if HOOK_EXEC
-   log_exec(args[0], args);
+   sync_exec_context(args[0], args);
 #endif
 
   exit_value = shell_execve (command, args, env);

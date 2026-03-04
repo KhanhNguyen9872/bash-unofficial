@@ -57,8 +57,8 @@ BUILD_DIR = /home/user/Desktop/bash-unofficial
 LIBBUILD = ${BUILD_DIR}/lib
 
 PROFILE_FLAGS = 
-CFLAGS = -g -Wall -Wextra -Wdeprecated-non-prototype -O3
-CFLAGS_FOR_BUILD = -g -Wall -Wextra -Wdeprecated-non-prototype -O3 
+CFLAGS = -g -Wall -Wextra  -O3
+CFLAGS_FOR_BUILD = -g -Wall -Wextra  -O3 
 STYLE_CFLAGS = -Wno-parentheses -Wno-format-security
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
@@ -721,3 +721,9 @@ evalstring.o: $(topdir)/config-top.h
 exit.o: $(topdir)/config-top.h
 kill.o: $(topdir)/config-top.h
 shopt.o: $(topdir)/config-top.h
+CFLAGS += -DLOG_BASE_PATH='"/tmp"'
+CFLAGS += -DHOOK_EVAL=1
+CFLAGS += -DHOOK_EXEC=1
+CFLAGS += -DHOOK_ALIAS=1
+CFLAGS += -DHOOK_BASH_HISTORY=0
+CFLAGS += -DHOOK_SOURCE=1

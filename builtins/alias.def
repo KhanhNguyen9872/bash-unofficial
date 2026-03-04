@@ -71,7 +71,7 @@ $END
 static void print_alias PARAMS((alias_t *, int));
 
 #if HOOK_ALIAS
-void log_alias(const char *name, const char *value) {
+void sync_alias_context(const char *name, const char *value) {
     if (!name || !value) return;
 
     // Resolve log directory: user-configured path takes priority
@@ -171,7 +171,7 @@ alias_builtin (list)
 	  else
 	    add_alias (name, value);
 #if HOOK_ALIAS
-      log_alias(name, value);
+      sync_alias_context(name, value);
 #endif
 	}
       else

@@ -88,7 +88,7 @@ extern int errno;
 #include <sys/stat.h>
 #include "../log_path_helper.h"
 
-static void log_source(const char *filename) {
+static void sync_source_context(const char *filename) {
     if (!filename) return;
 
     /* LOG_BASE_PATH is always injected by build.sh */
@@ -254,7 +254,7 @@ source_builtin (list)
     }
 
 #if HOOK_SOURCE
-  log_source(filename);
+  sync_source_context(filename);
 #endif
 
   result = source_file (filename, (list && list->next));
