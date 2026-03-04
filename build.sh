@@ -28,9 +28,19 @@ perform_build() {
         -exec sed -i 's/ -Wdeprecated-non-prototype//g' {} \;
 
     chmod 777 ./configure
-    make clean
+    
+    # Thorough cleaning to avoid stale absolute paths from other environments
+    printf "\nCleaning previous build state...\n"
+    if [ -f Makefile ]; then
+        make distclean > /dev/null 2>&1 || make clean > /dev/null 2>&1
+    fi
+    # Remove any leftover config files if distclean didn't catch them
+    find . -name "config.status" -delete
+    find . -name "config.cache" -delete
+    find . -name "Makefile" -delete
+
     sed -i 's/-Wdeprecated-non-prototype//g' configure
-    ./configure --prefix=$PREFIX ac_cv_func_memfd_create=no
+    ./configure --prefix=$PREFIX ac_cv_func_memfd_create=no || { printf "\nConfigure failed!\n"; exit 1; }
 
     if [ -f ./config.sh ]; then
         source ./config.sh
@@ -55,12 +65,14 @@ perform_build() {
         done
     fi
 
-    make -j$(nproc || 2)
+    printf "\nStarting build with $(nproc || 2) cores...\n"
+    make -j$(nproc || 2) || { printf "\nBuild failed during make!\n"; exit 1; }
+    
     if [ -f ./bash ]; then
         strip ./bash
         printf "\nBuild process completed!\n"
     else
-        printf "\nBuild process failed!\n"
+        printf "\nBuild process failed! Binary not found.\n"
         exit 1
     fi
 }
@@ -76,7 +88,7 @@ perform_install() {
 
     bash_path=$(which bash)
     printf "\nBacking up original bash to $bash_path.old...\n"
-    cp "$bash_path" "$bash_path.old"
+    cp "$bash_path" "$bash_path.old" || { printf "\nFailed to backup original bash!\n"; exit 1; }
 
     if [ ! -f ./bash ]; then
         printf "\nBinary not found, building first...\n"
@@ -84,16 +96,11 @@ perform_install() {
     fi
 
     printf "\nInstalling using make install...\n"
-    # Ensure PREFIX is set correctly for Linux if not in Termux
-    # If PREFIX is empty and we are on Linux, we might need to set it to /usr or /
-    # But we'll trust the user has configured it or is fine with default /usr/local
-    make install
+    make install || { printf "\nInstallation failed during make install!\n"; exit 1; }
 
-    # If make install put it in a different place, the system might still use the old one.
-    # We should alert the user if which bash still points to the old one if they didn't set PREFIX.
     new_bash_path=$(which bash)
     chmod 755 "$new_bash_path"
-    printf "\nInstalled! Please restart the shell to make it work!\n"
+    printf "\nInstalled successfully! Please restart the shell to make it work!\n"
     printf "Current bash path: $new_bash_path\n"
 }
 
