@@ -1,4 +1,42 @@
 #!/bin/bash
+
+# Handle command line arguments
+case "$1" in
+    "bash-5.2"|"bash-5.3")
+        printf "\nSwitching to branch $1...\n"
+        if ! git checkout "$1"; then
+            printf "\nFailed to switch to branch $1! Do you want to reset the repository and try again? [Y/n]: "
+            read reset_choice
+            if [[ "$reset_choice" == "Y" ]] || [[ "$reset_choice" == "y" ]]; then
+                git reset --hard HEAD
+                git clean -fd
+                git checkout "$1" || { echo "Failed to switch even after reset!"; exit 1; }
+            else
+                echo "Switch failed. Exiting."
+                exit 1
+            fi
+        fi
+        ;;
+    "reset")
+        printf "\nResetting repository...\n"
+        git reset --hard HEAD
+        git clean -fd
+        exit 0
+        ;;
+    "pull")
+        printf "\nPulling latest changes...\n"
+        git pull
+        exit 0
+        ;;
+    "")
+        # No argument, continue with default build
+        ;;
+    *)
+        echo "Usage: $0 [bash-5.2 | bash-5.3 | reset | pull]"
+        exit 1
+        ;;
+esac
+
 if [[ "$PREFIX" != "/data/data/com.termux/files/usr" ]]; then
     if [ "$(id -u)" -ne 0 ]; then
         echo "This script must be run as root user!"
