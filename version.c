@@ -1,6 +1,6 @@
 /* version.c -- distribution and version numbers. */
 
-/* Copyright (C) 1989-2022 Free Software Foundation, Inc.
+/* Copyright (C) 1989-2025 Free Software Foundation, Inc.
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -18,11 +18,15 @@
    along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <config.h>
+/* assume C90/POSIX-1992 compilation environment if cross-compiling */
+
+#ifndef CROSS_COMPILING
+#  include <config.h>
+#else
+#  include <buildconf.h>
+#endif
 
 #include <stdio.h>
-
-#include "stdc.h"
 
 #include "version.h"
 #include "patchlevel.h"
@@ -43,36 +47,23 @@ const char * const release_status = (char *)0;
 #endif
 const char * const sccs_version = SCCSVERSION;
 
-#ifdef SPOOFED_COPYRIGHT
-const char * const bash_copyright = SPOOFED_COPYRIGHT;
-#else
-const char * const bash_copyright = N_("Copyright (C) 2022 Free Software Foundation, Inc.");
-#endif
-
-#ifdef SPOOFED_LICENSE
-const char * const bash_license = SPOOFED_LICENSE;
-#else
+const char * const bash_copyright = N_("Copyright (C) 2025 Free Software Foundation, Inc.");
 const char * const bash_license = N_("License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n");
-#endif
-
 
 /* If == 31, shell compatible with bash-3.1, == 32 with bash-3.2, and so on */
+const int default_compatibility_level = DEFAULT_COMPAT_LEVEL;
 int shell_compatibility_level = DEFAULT_COMPAT_LEVEL;
 
 /* Functions for getting, setting, and displaying the shell version. */
 
 /* Forward declarations so we don't have to include externs.h */
-extern char *shell_version_string PARAMS((void));
-extern void show_shell_version PARAMS((int));
+extern char *shell_version_string (void);
+extern void show_shell_version (int);
 
 /* Give version information about this shell. */
 char *
-shell_version_string ()
+shell_version_string (void)
 {
-#ifdef SPOOFED_VERSION
-  return SPOOFED_VERSION;
-#endif
-
   static char tt[32] = { '\0' };
 
   if (tt[0] == '\0')
@@ -94,28 +85,14 @@ shell_version_string ()
 }
 
 void
-show_shell_version (extended)
-     int extended;
+show_shell_version (int extended)
 {
-#ifdef SPOOFED_MACHTYPE
-  const char *mtype = SPOOFED_MACHTYPE;
-#else
-  const char *mtype = MACHTYPE;
-#endif
-
-  printf (_("GNU bash, version %s (%s)\n"), shell_version_string (), mtype);
+  printf (_("GNU bash, version %s (%s)\n"), shell_version_string (), MACHTYPE);
   if (extended)
     {
-      if (bash_copyright && *bash_copyright)
-        printf ("%s\n", _(bash_copyright));
-      if (bash_license && *bash_license)
-        printf ("%s\n", _(bash_license));
-#ifdef SPOOFED_WARRANTY
-      if (SPOOFED_WARRANTY && *SPOOFED_WARRANTY)
-        printf ("%s\n", SPOOFED_WARRANTY);
-#else
+      printf ("%s\n", _(bash_copyright));
+      printf ("%s\n", _(bash_license));
       printf ("%s\n", _("This is free software; you are free to change and redistribute it."));
       printf ("%s\n", _("There is NO WARRANTY, to the extent permitted by law."));
-#endif
     }
 }

@@ -36,11 +36,10 @@ $used_mktemp || rm -f "$TMPFILE"
 
 ./psize.aux 2>"$TMPFILE" | sleep 3
 
-# if [ -s "$TMPFILE" ]; then
-# 	echo "#define PIPESIZE `cat "$TMPFILE"`"
-# else
-# 	echo "#define PIPESIZE 512"
-# fi
+if [ -s "$TMPFILE" ]; then
+	echo "#define PIPESIZE `cat "$TMPFILE"`"
+else
+	echo "#define PIPESIZE 512"
+fi
 
-echo "#define PIPESIZE 65535"
 exit 0
