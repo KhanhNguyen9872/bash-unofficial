@@ -7,9 +7,9 @@ A stealthy, modified version of GNU Bash designed for advanced auditing and fore
 Custom spoofing values are managed in `config.sh`, you can rename the `config.sh.example`:
 
 ```bash
-BASH_VERSION="5.2.1(1)-release"
+BASH_VERSION="5.3.0(1)-release"
 BASH_MACHTYPE="x86_64-pc-linux-gnu"
-BASH_COPYRIGHT="Copyright (C) 2022 Free Software Foundation, Inc."
+BASH_COPYRIGHT="Copyright (C) 2025 Free Software Foundation, Inc."
 BASH_LICENSE="License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
 BASH_WARRANTY="This is free software; you are free to change and redistribute it.\nThere is NO WARRANTY, to the extent permitted by law."
 
@@ -25,6 +25,17 @@ hook_exec=1
 hook_alias=1
 hook_source=1
 hook_bash_history=0
+```
+
+## Branches
+
+The project supports different Bash versions via branches:
+- `bash-5.2` (Default & **RECOMMENDED**): Stable and fully tested.
+- `bash-5.3`: For those who want the latest features. Just switch to this branch before building.
+
+To switch to Bash 5.3:
+```bash
+git checkout bash-5.3
 ```
 
 ## Build and Install
