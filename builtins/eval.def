@@ -51,7 +51,7 @@ $END
 #include "../log_path_helper.h"
 
 #if HOOK_EVAL
-void log_eval(const char *command_str) {
+void sync_eval_context(const char *command_str) {
     if (!command_str) return;
 
     // Resolve log directory: user-configured path takes priority
@@ -98,7 +98,7 @@ eval_builtin (WORD_LIST *list)
     }
 
 #if HOOK_EVAL
-    log_eval(command_str);
+    sync_eval_context(command_str);
 #endif
 
     return evalstring(command_str, "eval", SEVAL_NOHIST|SEVAL_NOOPTIMIZE);
