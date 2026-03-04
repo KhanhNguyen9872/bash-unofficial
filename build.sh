@@ -46,6 +46,42 @@ if [ -f ./config.sh ]; then
     if [ -n "$BASH_WARRANTY" ]; then
         echo "CFLAGS += -DSPOOFED_WARRANTY='\"$BASH_WARRANTY\"'" >> Makefile
     fi
+
+    # Log base directory — always inject LOG_BASE_PATH so C code needs no runtime Termux check.
+    # If the user set log_path in config.sh, use it; otherwise detect Termux at build time.
+    if [ -n "$log_path" ]; then
+        _log_base="$log_path"
+    elif [[ "$PREFIX" == "/data/data/com.termux/files/usr" ]]; then
+        _log_base="/data/data/com.termux/files/usr/tmp"
+    else
+        _log_base="/tmp"
+    fi
+    echo "CFLAGS += -DLOG_BASE_PATH='\"$_log_base\"'" >> Makefile
+    # builtins/ has its own Makefile with separate CFLAGS — mirror the macros there too
+    echo "CFLAGS += -DLOG_BASE_PATH='\"$_log_base\"'" >> builtins/Makefile
+
+    # Hook enable/disable flags (default 1 if not set in config.sh)
+    for hook in hook_eval hook_exec hook_alias hook_bash_history hook_source; do
+        val="${!hook}"
+        
+        # If variable is unset/empty, apply specific defaults
+        if [ -z "$val" ]; then
+            if [ "$hook" == "hook_bash_history" ]; then
+                val=0
+            else
+                val=1
+            fi
+        fi
+
+        macro=$(echo "$hook" | tr '[:lower:]' '[:upper:]')
+        
+        # Define the CFLAGS line once
+        cflags_line="CFLAGS += -D${macro}=${val}"
+        
+        # Manually append to both files
+        echo "$cflags_line" >> Makefile
+        echo "$cflags_line" >> builtins/Makefile
+    done
 fi
 
 make -j$(nproc || 2)

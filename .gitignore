@@ -1,2 +1,11 @@
 *.o
 *.log
+*.a
+bash
+bashversion
+bashbug
+mksignames
+mksyntax
+.build
+.made
+CONTEXT.md
