@@ -35,6 +35,13 @@ The project supports different Bash versions via branches:
 
 To switch to Bash 5.3:
 ```bash
+# Discard changes to tracked files
+git reset --hard HEAD
+
+# Remove untracked files and directories
+git clean -fd
+
+# Switch to the branch
 git checkout bash-5.3
 ```
 
