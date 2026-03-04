@@ -31,18 +31,15 @@ hook_bash_history=0
 
 The project supports different Bash versions via branches:
 - `bash-5.2` (Default & **RECOMMENDED**): Stable and fully tested.
-- `bash-5.3`: For those who want the latest features. Just switch to this branch before building.
+- `bash-5.3`: For those who want the latest features.
 
-To switch to Bash 5.3:
+To switch to Bash 5.3 and build it:
 ```bash
-# Discard changes to tracked files
-git reset --hard HEAD
+# On Linux
+sudo bash build.sh bash-5.3
 
-# Remove untracked files and directories
-git clean -fd
-
-# Switch to the branch
-git checkout bash-5.3
+# On Termux
+bash build.sh bash-5.3
 ```
 
 ## Build and Install
@@ -55,6 +52,18 @@ sudo bash build.sh
 To build on **Termux**:
 ```bash
 bash build.sh
+```
+
+## Maintenance Commands
+
+You can also use `build.sh` for maintenance:
+
+```bash
+# Reset the repository (git reset --hard and git clean)
+bash build.sh reset
+
+# Pull the latest changes from the repository
+bash build.sh pull
 ```
 
 The script will:
