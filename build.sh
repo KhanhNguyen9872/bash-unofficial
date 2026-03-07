@@ -29,11 +29,6 @@ perform_build() {
 
     chmod 777 ./configure
     
-    # Thorough cleaning to avoid stale absolute paths from other environments
-    printf "\nCleaning previous build state...\n"
-    if [ -f Makefile ]; then
-        make distclean > /dev/null 2>&1 || make clean > /dev/null 2>&1
-    fi
     # Remove any leftover config files if distclean didn't catch them
     find . -name "config.status" -delete
     find . -name "config.cache" -delete
